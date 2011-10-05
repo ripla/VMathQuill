@@ -1,58 +1,45 @@
 package org.vaadin.risto.mathquill.client.ui;
 
+import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.ui.TextBoxBase;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.user.client.ui.Widget;
 
-public class VMathTextField extends Widget implements Paintable {
+public class VMathTextField extends TextBoxBase implements Paintable {
 
-	/** Set the CSS class name to allow styling. */
-	public static final String CLASSNAME = "v-mathtextfield";
+    /** Set the CSS class name to allow styling. */
+    public static final String CLASSNAME = "v-mathtextfield";
 
-	/** The client side widget identifier */
-	protected String paintableId;
+    private static DivElement baseElement;
 
-	/** Reference to the server connection object. */
-	ApplicationConnection client;
+    /** The client side widget identifier */
+    protected String paintableId;
 
-	/**
-	 * The constructor should first call super() to initialize the component and
-	 * then handle any initialization relevant to Vaadin.
-	 */
-	public VMathTextField() {
-		// TODO Example code is extending GWT Widget so it must set a root element.
-		// Change to proper element or remove if extending another widget
-		setElement(Document.get().createDivElement());
-		
-		// This method call of the Paintable interface sets the component
-		// style name in DOM tree
-		setStyleName(CLASSNAME);
-	}
+    /** Reference to the server connection object. */
+    ApplicationConnection client;
 
-    /**
-     * Called whenever an update is received from the server 
-     */
-	public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
-		// This call should be made first. 
-		// It handles sizes, captions, tooltips, etc. automatically.
-		if (client.updateComponent(this, uidl, true)) {
-		    // If client.updateComponent returns true there has been no changes and we
-		    // do not need to update anything.
-			return;
-		}
+    public VMathTextField() {
+        super(baseElement = Document.get().createDivElement());
 
-		// Save reference to server connection object to be able to send
-		// user interaction later
-		this.client = client;
+        setElement(baseElement);
 
-		// Save the client side identifier (paintable id) for the widget
-		paintableId = uidl.getId();
+        setStyleName(CLASSNAME);
+    }
 
-		// TODO replace dummy code with actual component logic
-		getElement().setInnerHTML("It works!");
-		
-	}
+    public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
+        if (client.updateComponent(this, uidl, true)) {
+            // no changes, no update
+            return;
+        }
+
+        this.client = client;
+
+        paintableId = uidl.getId();
+
+        // TODO
+        getElement().setInnerHTML("It works!");
+    }
 
 }

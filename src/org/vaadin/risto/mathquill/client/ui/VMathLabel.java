@@ -1,58 +1,40 @@
 package org.vaadin.risto.mathquill.client.ui;
 
+import com.google.gwt.dom.client.Element;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.user.client.ui.Widget;
+import com.vaadin.terminal.gwt.client.ui.VLabel;
 
-public class VMathLabel extends Widget implements Paintable {
+public class VMathLabel extends VLabel implements Paintable {
 
-	/** Set the CSS class name to allow styling. */
-	public static final String CLASSNAME = "v-mathlabel";
+    protected String paintableId;
 
-	/** The client side widget identifier */
-	protected String paintableId;
+    protected ApplicationConnection client;
 
-	/** Reference to the server connection object. */
-	ApplicationConnection client;
+    public VMathLabel() {
+        super();
+    }
 
-	/**
-	 * The constructor should first call super() to initialize the component and
-	 * then handle any initialization relevant to Vaadin.
-	 */
-	public VMathLabel() {
-		// TODO Example code is extending GWT Widget so it must set a root element.
-		// Change to proper element or remove if extending another widget
-		setElement(Document.get().createDivElement());
-		
-		// This method call of the Paintable interface sets the component
-		// style name in DOM tree
-		setStyleName(CLASSNAME);
-	}
+    @Override
+    public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
+        if (client.updateComponent(this, uidl, true)) {
+            // no changes, no update
+            return;
+        }
 
-    /**
-     * Called whenever an update is received from the server 
-     */
-	public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
-		// This call should be made first. 
-		// It handles sizes, captions, tooltips, etc. automatically.
-		if (client.updateComponent(this, uidl, true)) {
-		    // If client.updateComponent returns true there has been no changes and we
-		    // do not need to update anything.
-			return;
-		}
+        this.client = client;
 
-		// Save reference to server connection object to be able to send
-		// user interaction later
-		this.client = client;
+        paintableId = uidl.getId();
 
-		// Save the client side identifier (paintable id) for the widget
-		paintableId = uidl.getId();
+        setText(uidl.getChildString(0));
 
-		// TODO replace dummy code with actual component logic
-		getElement().setInnerHTML("It works!");
-		
-	}
+        mathify(this.getElement());
+    }
+
+    public static native void mathify(Element e) /*-{ 
+                                                 $wnd.$(e).mathquill()
+                                                 
+                                                 }-*/;
 
 }
