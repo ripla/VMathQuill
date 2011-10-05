@@ -1,12 +1,14 @@
 package org.vaadin.risto.mathquill;
 
 import com.vaadin.Application;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
@@ -46,21 +48,28 @@ public class MathQuillDemoApplication extends Application {
     }
 
     private Component buildMathLabelDemo() {
-        Label firstExampleHeader = new Label("Examples");
-        Label firstExampleNormal = new Label(
+        ObjectProperty<String> exampleDatasource = new ObjectProperty<String>(
                 "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+
+        Label mathLabelHeader = new Label("MathLabel");
+        mathLabelHeader.setStyleName(Reindeer.LABEL_H1);
+        Label firstExampleHeader = new Label("Example");
         firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
-        MathLabel firstExample = new MathLabel(
-                "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+        TextField firstExampleSource = new TextField("Label contents",
+                exampleDatasource);
+        firstExampleSource.setImmediate(true);
+        MathLabel firstExample = new MathLabel(exampleDatasource);
 
         HorizontalLayout firstExampleLayout = new HorizontalLayout();
-        firstExampleLayout.setWidth("100%");
-        firstExampleLayout.addComponent(firstExampleNormal);
+        firstExampleLayout.setWidth("70%");
+        firstExampleLayout.addComponent(firstExampleSource);
         firstExampleLayout.addComponent(firstExample);
 
-        Panel panel = new Panel("MathLabel");
+        Panel panel = new Panel();
         panel.setWidth("100%");
         ((AbstractOrderedLayout) panel.getContent()).setSpacing(true);
+
+        panel.addComponent(mathLabelHeader);
         panel.addComponent(new Label(
                 "MathLabel integrates MathQuill as a Vaadin Label, enabling users to display static texts as beautiful math."));
         panel.addComponent(firstExampleHeader);
@@ -70,21 +79,29 @@ public class MathQuillDemoApplication extends Application {
     }
 
     private Component buildMathTextFieldDemo() {
-        Label firstExampleHeader = new Label("Examples");
-        Label firstExampleNormal = new Label(
+        ObjectProperty<String> exampleDatasource = new ObjectProperty<String>(
                 "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+
+        Label mathLabelHeader = new Label("MathTextField");
+        mathLabelHeader.setStyleName(Reindeer.LABEL_H1);
+        Label firstExampleHeader = new Label("Example");
+        TextField firstExampleSource = new TextField("Field contents",
+                exampleDatasource);
+        firstExampleSource.setImmediate(true);
         firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
-        MathTextField firstExample = new MathTextField(
-                "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+        MathTextField firstExample = new MathTextField("Normal MathTextField",
+                exampleDatasource);
 
         HorizontalLayout firstExampleLayout = new HorizontalLayout();
-        firstExampleLayout.setWidth("100%");
-        firstExampleLayout.addComponent(firstExampleNormal);
+        firstExampleLayout.setWidth("70%");
+        firstExampleLayout.addComponent(firstExampleSource);
         firstExampleLayout.addComponent(firstExample);
 
-        Panel panel = new Panel("MathTextField");
+        Panel panel = new Panel("");
         panel.setWidth("100%");
         ((AbstractOrderedLayout) panel.getContent()).setSpacing(true);
+
+        panel.addComponent(mathLabelHeader);
         panel.addComponent(new Label(
                 "MathTextField integrates MathQuills editable math textbox, enabling users to display and edit math."));
         panel.addComponent(firstExampleHeader);

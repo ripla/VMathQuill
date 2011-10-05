@@ -25,6 +25,7 @@ public class VMathTextField extends HTML implements Paintable {
         setStyleName(CLASSNAME);
         innerElement = DOM.createSpan();
         getElement().appendChild(innerElement);
+        MathJsBridge.mathifyEditable(innerElement);
     }
 
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
@@ -38,17 +39,12 @@ public class VMathTextField extends HTML implements Paintable {
         paintableId = uidl.getId();
 
         if (uidl.hasAttribute(Communication.ATT_CONTENT)) {
-            innerElement.setInnerText(uidl
-                    .getStringAttribute(Communication.ATT_CONTENT));
+            MathJsBridge.setMathContent(innerElement,
+                    uidl.getStringAttribute(Communication.ATT_CONTENT));
         }
 
-        mathify(innerElement);
+        MathJsBridge.updateMath(innerElement);
         Util.notifyParentOfSizeChange(this, true);
     }
-
-    public static native void mathify(Element e) /*-{ 
-                                                 $wnd.$(e).mathquill('editable')
-                                                 
-                                                 }-*/;
 
 }

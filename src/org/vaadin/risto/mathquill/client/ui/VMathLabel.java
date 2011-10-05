@@ -1,6 +1,5 @@
 package org.vaadin.risto.mathquill.client.ui;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.HTML;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
@@ -22,7 +21,7 @@ public class VMathLabel extends HTML implements Paintable {
         setStyleName(CLASSNAME);
         innerElement = DOM.createSpan();
         getElement().appendChild(innerElement);
-        mathify(innerElement);
+        MathJsBridge.makeMathElement(innerElement);
     }
 
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
@@ -36,26 +35,12 @@ public class VMathLabel extends HTML implements Paintable {
         paintableId = uidl.getId();
 
         if (uidl.hasAttribute(Communication.ATT_CONTENT)) {
-            setMathContent(innerElement,
+            MathJsBridge.setMathContent(innerElement,
                     uidl.getStringAttribute(Communication.ATT_CONTENT));
         }
 
-        updateMath(innerElement);
+        MathJsBridge.updateMath(innerElement);
         Util.notifyParentOfSizeChange(this, true);
     }
 
-    public static native void mathify(Element e) /*-{ 
-                                                 $wnd.$(e).mathquill()
-                                                 
-                                                 }-*/;
-
-    public static native void setMathContent(Element e, String content) /*-{ 
-                                                                         $wnd.$(e).mathquill('latex', content)
-                                                                         
-                                                                         }-*/;
-
-    public static native void updateMath(Element e) /*-{ 
-                                                    $wnd.$(e).mathquill('redraw')
-                                                    
-                                                    }-*/;
 }
