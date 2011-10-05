@@ -1,5 +1,7 @@
 package org.vaadin.risto.mathquill;
 
+import org.vaadin.risto.mathquill.client.ui.Communication;
+
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
@@ -15,13 +17,18 @@ import com.vaadin.ui.AbstractComponent;
 public class MathTextField extends AbstractComponent {
 
     private static final long serialVersionUID = 1446152150503621276L;
+    private final String content;
+
+    public MathTextField(String content) {
+        this.content = content;
+    }
 
     @Override
     public void paintContent(PaintTarget target) throws PaintException {
         super.paintContent(target);
 
-        // TODO Paint any component specific content by setting attributes
-        // These attributes can be read in updateFromUIDL in the widget.
+        if (content != null && !"".equals(content)) {
+            target.addAttribute(Communication.ATT_CONTENT, content);
+        }
     }
-
 }

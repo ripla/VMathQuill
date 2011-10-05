@@ -1,18 +1,16 @@
 package org.vaadin.risto.mathquill.client.ui;
 
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.user.client.ui.TextBoxBase;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.HTML;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
+import com.vaadin.terminal.gwt.client.Util;
 
-public class VMathTextField extends TextBoxBase implements Paintable {
+public class VMathTextField extends HTML implements Paintable {
 
-    /** Set the CSS class name to allow styling. */
     public static final String CLASSNAME = "v-mathtextfield";
-
-    private static DivElement baseElement;
 
     /** The client side widget identifier */
     protected String paintableId;
@@ -20,12 +18,13 @@ public class VMathTextField extends TextBoxBase implements Paintable {
     /** Reference to the server connection object. */
     ApplicationConnection client;
 
+    private final Element innerElement;
+
     public VMathTextField() {
-        super(baseElement = Document.get().createDivElement());
-
-        setElement(baseElement);
-
+        super();
         setStyleName(CLASSNAME);
+        innerElement = DOM.createSpan();
+        getElement().appendChild(innerElement);
     }
 
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
@@ -38,8 +37,18 @@ public class VMathTextField extends TextBoxBase implements Paintable {
 
         paintableId = uidl.getId();
 
-        // TODO
-        getElement().setInnerHTML("It works!");
+        if (uidl.hasAttribute(Communication.ATT_CONTENT)) {
+            innerElement.setInnerText(uidl
+                    .getStringAttribute(Communication.ATT_CONTENT));
+        }
+
+        mathify(innerElement);
+        Util.notifyParentOfSizeChange(this, true);
     }
+
+    public static native void mathify(Element e) /*-{ 
+                                                 $wnd.$(e).mathquill('editable')
+                                                 
+                                                 }-*/;
 
 }

@@ -1,22 +1,30 @@
 package org.vaadin.risto.mathquill.client.ui;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.HTML;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
-import com.vaadin.terminal.gwt.client.ui.VLabel;
+import com.vaadin.terminal.gwt.client.Util;
 
-public class VMathLabel extends VLabel implements Paintable {
+public class VMathLabel extends HTML implements Paintable {
+    public static final String CLASSNAME = "v-mathlabel";
 
     protected String paintableId;
 
     protected ApplicationConnection client;
 
+    private final com.google.gwt.user.client.Element innerElement;
+
     public VMathLabel() {
         super();
+        setStyleName(CLASSNAME);
+        innerElement = DOM.createSpan();
+        getElement().appendChild(innerElement);
+        mathify(innerElement);
     }
 
-    @Override
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
         if (client.updateComponent(this, uidl, true)) {
             // no changes, no update
@@ -27,9 +35,13 @@ public class VMathLabel extends VLabel implements Paintable {
 
         paintableId = uidl.getId();
 
-        setText(uidl.getChildString(0));
+        if (uidl.hasAttribute(Communication.ATT_CONTENT)) {
+            setMathContent(innerElement,
+                    uidl.getStringAttribute(Communication.ATT_CONTENT));
+        }
 
-        mathify(this.getElement());
+        updateMath(innerElement);
+        Util.notifyParentOfSizeChange(this, true);
     }
 
     public static native void mathify(Element e) /*-{ 
@@ -37,4 +49,13 @@ public class VMathLabel extends VLabel implements Paintable {
                                                  
                                                  }-*/;
 
+    public static native void setMathContent(Element e, String content) /*-{ 
+                                                                         $wnd.$(e).mathquill('latex', content)
+                                                                         
+                                                                         }-*/;
+
+    public static native void updateMath(Element e) /*-{ 
+                                                    $wnd.$(e).mathquill('redraw')
+                                                    
+                                                    }-*/;
 }

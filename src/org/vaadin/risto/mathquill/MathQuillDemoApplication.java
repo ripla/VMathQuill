@@ -37,8 +37,10 @@ public class MathQuillDemoApplication extends Application {
         demoLayout.setSpacing(true);
 
         Component mathLabelDemo = buildMathLabelDemo();
+        Component mathTextFieldDemo = buildMathTextFieldDemo();
 
         demoLayout.addComponent(mathLabelDemo);
+        demoLayout.addComponent(mathTextFieldDemo);
 
         return demoLayout;
     }
@@ -52,15 +54,41 @@ public class MathQuillDemoApplication extends Application {
                 "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
 
         HorizontalLayout firstExampleLayout = new HorizontalLayout();
+        firstExampleLayout.setWidth("100%");
         firstExampleLayout.addComponent(firstExampleNormal);
         firstExampleLayout.addComponent(firstExample);
 
         Panel panel = new Panel("MathLabel");
+        panel.setWidth("100%");
         ((AbstractOrderedLayout) panel.getContent()).setSpacing(true);
         panel.addComponent(new Label(
                 "MathLabel integrates MathQuill as a Vaadin Label, enabling users to display static texts as beautiful math."));
         panel.addComponent(firstExampleHeader);
-        panel.addComponent(firstExample);
+        panel.addComponent(firstExampleLayout);
+
+        return panel;
+    }
+
+    private Component buildMathTextFieldDemo() {
+        Label firstExampleHeader = new Label("Examples");
+        Label firstExampleNormal = new Label(
+                "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+        firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
+        MathTextField firstExample = new MathTextField(
+                "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+
+        HorizontalLayout firstExampleLayout = new HorizontalLayout();
+        firstExampleLayout.setWidth("100%");
+        firstExampleLayout.addComponent(firstExampleNormal);
+        firstExampleLayout.addComponent(firstExample);
+
+        Panel panel = new Panel("MathTextField");
+        panel.setWidth("100%");
+        ((AbstractOrderedLayout) panel.getContent()).setSpacing(true);
+        panel.addComponent(new Label(
+                "MathTextField integrates MathQuills editable math textbox, enabling users to display and edit math."));
+        panel.addComponent(firstExampleHeader);
+        panel.addComponent(firstExampleLayout);
 
         return panel;
     }
