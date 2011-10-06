@@ -1,12 +1,17 @@
 package org.vaadin.risto.mathquill.client.ui;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.EventTarget;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.HTML;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.Util;
+import com.vaadin.terminal.gwt.client.VConsole;
 
 public class VMathTextField extends HTML implements Paintable {
 
@@ -16,9 +21,13 @@ public class VMathTextField extends HTML implements Paintable {
     protected String paintableId;
 
     /** Reference to the server connection object. */
-    ApplicationConnection client;
+    private ApplicationConnection client;
 
-    private final Element innerElement;
+    private Element innerElement;
+
+    private boolean mixedMode = false;
+
+    private HandlerRegistration blurHandler;
 
     public VMathTextField() {
         super();
@@ -26,6 +35,25 @@ public class VMathTextField extends HTML implements Paintable {
         innerElement = DOM.createSpan();
         getElement().appendChild(innerElement);
         MathJsBridge.mathifyEditable(innerElement);
+    }
+
+    @Override
+    protected void onAttach() {
+        super.onAttach();
+        BlurHandler handler = createBlurHandler();
+        this.addHandler(handler, BlurEvent.getType());
+    }
+
+    @Override
+    protected void onDetach() {
+        removeBlurHandler();
+        super.onDetach();
+    }
+
+    protected void removeBlurHandler() {
+        if (blurHandler != null) {
+            blurHandler.removeHandler();
+        }
     }
 
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
@@ -38,13 +66,48 @@ public class VMathTextField extends HTML implements Paintable {
 
         paintableId = uidl.getId();
 
-        if (uidl.hasAttribute(Communication.ATT_CONTENT)) {
-            MathJsBridge.setMathContent(innerElement,
-                    uidl.getStringAttribute(Communication.ATT_CONTENT));
-        }
+        boolean serverMixedMode = uidl
+                .getBooleanAttribute(Communication.ATT_MIXEDMODE);
+        String serverContent = uidl
+                .getStringAttribute(Communication.ATT_CONTENT);
 
-        MathJsBridge.updateMath(innerElement);
+        if (serverMixedMode != mixedMode) {
+            mixedMode = serverMixedMode;
+
+            resetInnerElement(serverContent);
+
+            if (mixedMode) {
+                MathJsBridge.mathifyTextBox(innerElement);
+            } else {
+                MathJsBridge.mathifyEditable(innerElement);
+            }
+        } else {
+            MathJsBridge.setMathContent(innerElement, serverContent);
+            MathJsBridge.updateMath(innerElement);
+        }
         Util.notifyParentOfSizeChange(this, true);
     }
 
+    private void resetInnerElement(String serverContent) {
+        getElement().removeChild(innerElement);
+        innerElement = DOM.createSpan();
+        innerElement.setInnerHTML(serverContent);
+        getElement().appendChild(innerElement);
+
+    }
+
+    private BlurHandler createBlurHandler() {
+        return new BlurHandler() {
+            public void onBlur(BlurEvent event) {
+                EventTarget target = event.getNativeEvent().getEventTarget();
+                boolean eventTargetsField = getElement().isOrHasChild(
+                        Element.as(target));
+
+                if (eventTargetsField) {
+                    VConsole.log("BlurEvent targets field!");
+                }
+            }
+
+        };
+    }
 }

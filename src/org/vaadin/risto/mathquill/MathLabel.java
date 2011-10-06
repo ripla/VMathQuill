@@ -12,8 +12,10 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Component;
 
 /**
+ * <p>
  * Label that uses the MathQuill javascript library to render math symbols in
  * the browser.
+ * </p>
  * 
  * @author Risto Yrjänä / Vaadin Ltd.
  * @see MathTextField

@@ -45,6 +45,8 @@ public class MathTextField extends AbstractField {
         if (hasValue()) {
             target.addAttribute(Communication.ATT_CONTENT, getValue());
         }
+
+        target.addAttribute(Communication.ATT_MIXEDMODE, isMixedMode());
     }
 
     private boolean hasValue() {
@@ -59,6 +61,13 @@ public class MathTextField extends AbstractField {
     @Override
     public String getValue() {
         return (String) super.getValue();
+    }
+
+    @Override
+    public void setValue(Object newValue) throws ReadOnlyException,
+            ConversionException {
+        super.setValue(newValue);
+        requestRepaint();
     }
 
     @Override

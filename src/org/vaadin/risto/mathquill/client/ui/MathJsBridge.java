@@ -2,6 +2,12 @@ package org.vaadin.risto.mathquill.client.ui;
 
 import com.google.gwt.dom.client.Element;
 
+/**
+ * Bridge between GWT and the MathQuill javascript library.
+ * 
+ * @author Risto Yrjänä / Vaadin Ltd.
+ * 
+ */
 public class MathJsBridge {
 
     /**
@@ -21,6 +27,16 @@ public class MathJsBridge {
      */
     public static native void mathifyEditable(Element e) /*-{ 
                                                          $wnd.$(e).mathquill('editable')
+                                                         
+                                                         }-*/;
+
+    /**
+     * Mark the given element as editable textbox for MathQuill
+     * 
+     * @param e
+     */
+    public static native void mathifyTextBox(Element e) /*-{ 
+                                                         $wnd.$(e).mathquill('textbox')
                                                          
                                                          }-*/;
 

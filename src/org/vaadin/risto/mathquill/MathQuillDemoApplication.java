@@ -79,23 +79,16 @@ public class MathQuillDemoApplication extends Application {
     }
 
     private Component buildMathTextFieldDemo() {
-        ObjectProperty<String> exampleDatasource = new ObjectProperty<String>(
-                "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
-
         Label mathLabelHeader = new Label("MathTextField");
         mathLabelHeader.setStyleName(Reindeer.LABEL_H1);
-        Label firstExampleHeader = new Label("Example");
-        TextField firstExampleSource = new TextField("Field contents",
-                exampleDatasource);
-        firstExampleSource.setImmediate(true);
-        firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
-        MathTextField firstExample = new MathTextField("Normal MathTextField",
-                exampleDatasource);
 
-        HorizontalLayout firstExampleLayout = new HorizontalLayout();
-        firstExampleLayout.setWidth("70%");
-        firstExampleLayout.addComponent(firstExampleSource);
-        firstExampleLayout.addComponent(firstExample);
+        Label firstExampleHeader = new Label("Example");
+        Label secondExampleHeader = new Label("Example, mixed mode");
+        firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
+        secondExampleHeader.setStyleName(Reindeer.LABEL_H2);
+
+        HorizontalLayout normalExample = createMathTextFieldExample(false);
+        HorizontalLayout mixedModeExample = createMathTextFieldExample(true);
 
         Panel panel = new Panel("");
         panel.setWidth("100%");
@@ -105,8 +98,38 @@ public class MathQuillDemoApplication extends Application {
         panel.addComponent(new Label(
                 "MathTextField integrates MathQuills editable math textbox, enabling users to display and edit math."));
         panel.addComponent(firstExampleHeader);
-        panel.addComponent(firstExampleLayout);
+        panel.addComponent(normalExample);
+        panel.addComponent(secondExampleHeader);
+        panel.addComponent(new Label(
+                "When in mixed mode, MathTextField renders math only when its place between $ signs"));
+        panel.addComponent(mixedModeExample);
 
         return panel;
+    }
+
+    private HorizontalLayout createMathTextFieldExample(boolean isMixedMode) {
+        ObjectProperty<String> exampleDatasource;
+        if (isMixedMode) {
+            exampleDatasource = new ObjectProperty<String>(
+                    "Solution for the quadratic equation $\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}$ Cool, right?");
+        } else {
+            exampleDatasource = new ObjectProperty<String>(
+                    "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+        }
+        TextField firstExampleSource = new TextField("Field contents",
+                exampleDatasource);
+        firstExampleSource.setImmediate(true);
+
+        String mathTextFieldCaption = isMixedMode ? "Mixed mode MathTextField"
+                : "Normal MathTextField";
+        MathTextField firstExample = new MathTextField(mathTextFieldCaption,
+                exampleDatasource);
+        firstExample.setMixedMode(isMixedMode);
+
+        HorizontalLayout firstExampleLayout = new HorizontalLayout();
+        firstExampleLayout.setWidth("80%");
+        firstExampleLayout.addComponent(firstExampleSource);
+        firstExampleLayout.addComponent(firstExample);
+        return firstExampleLayout;
     }
 }
