@@ -42,5 +42,4 @@ public class VMathLabel extends HTML implements Paintable {
         MathJsBridge.updateMath(innerElement);
         Util.notifyParentOfSizeChange(this, true);
     }
-
 }

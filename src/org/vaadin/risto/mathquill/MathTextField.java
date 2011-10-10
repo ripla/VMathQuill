@@ -1,5 +1,7 @@
 package org.vaadin.risto.mathquill;
 
+import java.util.Map;
+
 import org.vaadin.risto.mathquill.client.ui.Communication;
 
 import com.vaadin.data.Property;
@@ -43,10 +45,19 @@ public class MathTextField extends AbstractField {
         super.paintContent(target);
 
         if (hasValue()) {
-            target.addAttribute(Communication.ATT_CONTENT, getValue());
+            target.addVariable(this, Communication.ATT_CONTENT, getValue());
         }
 
         target.addAttribute(Communication.ATT_MIXEDMODE, isMixedMode());
+    }
+
+    @Override
+    public void changeVariables(Object source, Map<String, Object> variables) {
+        super.changeVariables(source, variables);
+        if (variables.containsKey(Communication.ATT_CONTENT)) {
+            String newValue = (String) variables.get(Communication.ATT_CONTENT);
+            setValue(newValue, true);
+        }
     }
 
     private boolean hasValue() {

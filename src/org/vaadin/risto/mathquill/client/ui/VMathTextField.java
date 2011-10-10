@@ -1,17 +1,18 @@
 package org.vaadin.risto.mathquill.client.ui;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.EventTarget;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
+import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.Util;
-import com.vaadin.terminal.gwt.client.VConsole;
 
 public class VMathTextField extends HTML implements Paintable {
 
@@ -27,11 +28,20 @@ public class VMathTextField extends HTML implements Paintable {
 
     private boolean mixedMode = false;
 
-    private HandlerRegistration blurHandler;
+    private HandlerRegistration handlerRegistration;
+
+    private boolean hasFocus;
+
+    private final boolean immediate = true;
+
+    private final EventHandler eventHandler;
 
     public VMathTextField() {
         super();
         setStyleName(CLASSNAME);
+
+        eventHandler = new EventHandler();
+
         innerElement = DOM.createSpan();
         getElement().appendChild(innerElement);
         MathJsBridge.mathifyEditable(innerElement);
@@ -40,19 +50,42 @@ public class VMathTextField extends HTML implements Paintable {
     @Override
     protected void onAttach() {
         super.onAttach();
-        BlurHandler handler = createBlurHandler();
-        this.addHandler(handler, BlurEvent.getType());
+        handlerRegistration = Event
+                .addNativePreviewHandler(new NativePreviewHandler() {
+                    public void onPreviewNativeEvent(NativePreviewEvent event) {
+                        handlePreviewEvent(event);
+                    }
+
+                });
+    }
+
+    protected void handlePreviewEvent(NativePreviewEvent event) {
+        if (eventHandler.validEventTargetsThis(getElement(), event)) {
+            if (!hasFocus) {
+                hasFocus = true;
+            }
+        } else if (hasFocus
+                && eventHandler.shouldLoseFocusFor(getElement(), event)) {
+            hasFocus = false;
+            fireFocusLost();
+        }
+    }
+
+    protected void fireFocusLost() {
+        String value = MathJsBridge.getMathValue(innerElement);
+        client.updateVariable(paintableId, Communication.ATT_CONTENT, value,
+                immediate);
     }
 
     @Override
     protected void onDetach() {
-        removeBlurHandler();
+        removeHandler();
         super.onDetach();
     }
 
-    protected void removeBlurHandler() {
-        if (blurHandler != null) {
-            blurHandler.removeHandler();
+    protected void removeHandler() {
+        if (handlerRegistration != null) {
+            handlerRegistration.removeHandler();
         }
     }
 
@@ -69,7 +102,7 @@ public class VMathTextField extends HTML implements Paintable {
         boolean serverMixedMode = uidl
                 .getBooleanAttribute(Communication.ATT_MIXEDMODE);
         String serverContent = uidl
-                .getStringAttribute(Communication.ATT_CONTENT);
+                .getStringVariable(Communication.ATT_CONTENT);
 
         if (serverMixedMode != mixedMode) {
             mixedMode = serverMixedMode;
@@ -83,9 +116,16 @@ public class VMathTextField extends HTML implements Paintable {
             }
         } else {
             MathJsBridge.setMathContent(innerElement, serverContent);
-            MathJsBridge.updateMath(innerElement);
         }
+
         Util.notifyParentOfSizeChange(this, true);
+
+        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+
+            public void execute() {
+                MathJsBridge.updateMath(innerElement);
+            }
+        });
     }
 
     private void resetInnerElement(String serverContent) {
@@ -96,18 +136,4 @@ public class VMathTextField extends HTML implements Paintable {
 
     }
 
-    private BlurHandler createBlurHandler() {
-        return new BlurHandler() {
-            public void onBlur(BlurEvent event) {
-                EventTarget target = event.getNativeEvent().getEventTarget();
-                boolean eventTargetsField = getElement().isOrHasChild(
-                        Element.as(target));
-
-                if (eventTargetsField) {
-                    VConsole.log("BlurEvent targets field!");
-                }
-            }
-
-        };
-    }
 }

@@ -60,4 +60,9 @@ public class MathJsBridge {
                                                     $wnd.$(e).mathquill('redraw')
                                                     
                                                     }-*/;
+
+    public static native String getMathValue(Element e) /*-{ 
+                                                                   return $wnd.$(e).mathquill('latex')
+                                                                   
+                                                                   }-*/;
 }

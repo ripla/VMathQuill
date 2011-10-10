@@ -1,6 +1,8 @@
 package org.vaadin.risto.mathquill;
 
 import com.vaadin.Application;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -116,20 +118,30 @@ public class MathQuillDemoApplication extends Application {
             exampleDatasource = new ObjectProperty<String>(
                     "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
         }
-        TextField firstExampleSource = new TextField("Field contents",
+        final TextField exampleSource = new TextField("Field contents",
                 exampleDatasource);
-        firstExampleSource.setImmediate(true);
+        exampleSource.setImmediate(true);
 
         String mathTextFieldCaption = isMixedMode ? "Mixed mode MathTextField"
                 : "Normal MathTextField";
-        MathTextField firstExample = new MathTextField(mathTextFieldCaption,
+        MathTextField example = new MathTextField(mathTextFieldCaption,
                 exampleDatasource);
-        firstExample.setMixedMode(isMixedMode);
+        example.setMixedMode(isMixedMode);
 
-        HorizontalLayout firstExampleLayout = new HorizontalLayout();
-        firstExampleLayout.setWidth("80%");
-        firstExampleLayout.addComponent(firstExampleSource);
-        firstExampleLayout.addComponent(firstExample);
-        return firstExampleLayout;
+        HorizontalLayout exampleLayout = new HorizontalLayout();
+        exampleLayout.setWidth("80%");
+        exampleLayout.addComponent(exampleSource);
+        exampleLayout.addComponent(example);
+
+        // work around a bug
+        exampleDatasource.addListener(new Property.ValueChangeListener() {
+
+            private static final long serialVersionUID = 2198460842375047971L;
+
+            public void valueChange(ValueChangeEvent event) {
+                exampleSource.requestRepaint();
+            }
+        });
+        return exampleLayout;
     }
 }
