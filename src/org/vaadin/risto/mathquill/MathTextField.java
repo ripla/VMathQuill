@@ -30,6 +30,7 @@ public class MathTextField extends AbstractField {
 
     private static final long serialVersionUID = 1446152150503621276L;
     private boolean mixedMode;
+    private MathElement elementToAdd;
 
     public MathTextField(String caption) {
         this(caption, null);
@@ -100,6 +101,7 @@ public class MathTextField extends AbstractField {
      */
     public void setMixedMode(boolean mixedMode) {
         this.mixedMode = mixedMode;
+        requestRepaint();
     }
 
     /**
@@ -107,5 +109,14 @@ public class MathTextField extends AbstractField {
      */
     public boolean isMixedMode() {
         return mixedMode;
+    }
+
+    /**
+     * 
+     * @param mathElement
+     */
+    public void addMathElement(MathElement mathElement) {
+        elementToAdd = mathElement;
+        requestRepaint();
     }
 }

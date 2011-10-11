@@ -24,10 +24,12 @@ public class MathQuillDemoApplication extends Application {
         setTheme(Reindeer.THEME_NAME);
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setMargin(true);
+        mainLayout.setHeight("100%");
 
         Component demoLayout = buildDemoLayout();
         mainLayout.addComponent(demoLayout);
         demoLayout.setWidth("768px");
+        demoLayout.setHeight("100%");
         mainLayout.setComponentAlignment(demoLayout, Alignment.TOP_CENTER);
 
         Window mainWindow = new Window("MathQuill Vaadin integration demo");
