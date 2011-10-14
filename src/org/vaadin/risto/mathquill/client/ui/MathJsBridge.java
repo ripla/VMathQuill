@@ -16,8 +16,7 @@ public class MathJsBridge {
      * @param e
      */
     public static native void makeMathElement(Element e) /*-{ 
-                                                         $wnd.$(e).mathquill()
-                                                         
+                                                         $wnd.$(e).mathquill();
                                                          }-*/;
 
     /**
@@ -26,8 +25,7 @@ public class MathJsBridge {
      * @param e
      */
     public static native void mathifyEditable(Element e) /*-{ 
-                                                         $wnd.$(e).mathquill('editable')
-                                                         
+                                                         $wnd.$(e).mathquill('editable');
                                                          }-*/;
 
     /**
@@ -36,8 +34,7 @@ public class MathJsBridge {
      * @param e
      */
     public static native void mathifyTextBox(Element e) /*-{ 
-                                                         $wnd.$(e).mathquill('textbox')
-                                                         
+                                                         $wnd.$(e).mathquill('textbox');
                                                          }-*/;
 
     /**
@@ -47,8 +44,7 @@ public class MathJsBridge {
      * @param content
      */
     public static native void setMathContent(Element e, String content) /*-{ 
-                                                                        $wnd.$(e).mathquill('latex', content)
-                                                                        
+                                                                        $wnd.$(e).mathquill('latex', content);
                                                                         }-*/;
 
     /**
@@ -57,12 +53,46 @@ public class MathJsBridge {
      * @param e
      */
     public static native void updateMath(Element e) /*-{ 
-                                                    $wnd.$(e).mathquill('redraw')
-                                                    
+                                                    $wnd.$(e).mathquill('redraw');
                                                     }-*/;
 
+    /**
+     * Get the latex contents of the element
+     * 
+     * @param e
+     * @return
+     */
     public static native String getMathValue(Element e) /*-{ 
-                                                                   return $wnd.$(e).mathquill('latex')
-                                                                   
+                                                                   return $wnd.$(e).mathquill('latex');
                                                                    }-*/;
+
+    public static native boolean hasSelection(Element e) /*-{ 
+                                                         return $wnd.$(e).data('[[mathquill internal data]]').block.cursor.selection != undefined;
+                                                         }-*/;
+
+    public static native String getSelection(Element e) /*-{ 
+                                                        return $wnd.$(e).data('[[mathquill internal data]]').block.cursor.selection.latex();
+                                                        }-*/;
+
+    public static native void insertMath(Element e, String latex) /*-{ 
+                                                                  $wnd.$(e).data('[[mathquill internal data]]').block.cursor.writeLatex(latex);
+                                                                  }-*/;
+
+    public static native void stepBack(Element e, int stepBack) /*-{ 
+                                                                for(i=0; i<stepBack; i++) {
+                                                                $wnd.$(e).data('[[mathquill internal data]]').block.cursor.moveLeft();
+                                                                }                        
+                                                                }-*/;
+
+    public static native void focusElement(Element e) /*-{
+                                                      $wnd.$(e).focus();
+                                                      }-*/;
+
+    public static native void blurElement(Element e)/*-{
+                                                               $wnd.$(e).blur();
+                                                               }-*/;
+
+    // public static native void focusElement(Element e) /*-{
+    // $wnd.$(".v-mathtextfield  .hasCursor").focus()
+    // }-*/;
 }

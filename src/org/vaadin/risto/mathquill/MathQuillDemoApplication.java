@@ -6,6 +6,8 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -24,12 +26,10 @@ public class MathQuillDemoApplication extends Application {
         setTheme(Reindeer.THEME_NAME);
         VerticalLayout mainLayout = new VerticalLayout();
         mainLayout.setMargin(true);
-        mainLayout.setHeight("100%");
 
         Component demoLayout = buildDemoLayout();
         mainLayout.addComponent(demoLayout);
         demoLayout.setWidth("768px");
-        demoLayout.setHeight("100%");
         mainLayout.setComponentAlignment(demoLayout, Alignment.TOP_CENTER);
 
         Window mainWindow = new Window("MathQuill Vaadin integration demo");
@@ -44,9 +44,11 @@ public class MathQuillDemoApplication extends Application {
 
         Component mathLabelDemo = buildMathLabelDemo();
         Component mathTextFieldDemo = buildMathTextFieldDemo();
+        Component mathElementBarDemo = buildMathElementBarDemo();
 
         demoLayout.addComponent(mathLabelDemo);
         demoLayout.addComponent(mathTextFieldDemo);
+        demoLayout.addComponent(mathElementBarDemo);
 
         return demoLayout;
     }
@@ -91,8 +93,8 @@ public class MathQuillDemoApplication extends Application {
         firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
         secondExampleHeader.setStyleName(Reindeer.LABEL_H2);
 
-        HorizontalLayout normalExample = createMathTextFieldExample(false);
-        HorizontalLayout mixedModeExample = createMathTextFieldExample(true);
+        Component normalExample = createMathTextFieldExample(false);
+        Component mixedModeExample = createMathTextFieldExample(true);
 
         Panel panel = new Panel("");
         panel.setWidth("100%");
@@ -111,7 +113,7 @@ public class MathQuillDemoApplication extends Application {
         return panel;
     }
 
-    private HorizontalLayout createMathTextFieldExample(boolean isMixedMode) {
+    private Component createMathTextFieldExample(boolean isMixedMode) {
         ObjectProperty<String> exampleDatasource;
         if (isMixedMode) {
             exampleDatasource = new ObjectProperty<String>(
@@ -145,5 +147,41 @@ public class MathQuillDemoApplication extends Application {
             }
         });
         return exampleLayout;
+    }
+
+    private Component buildMathElementBarDemo() {
+        Label mathElementHeader = new Label("Adding math elements");
+        mathElementHeader.setStyleName(Reindeer.LABEL_H1);
+
+        final MathTextField targetField = new MathTextField();
+        targetField.setWidth("100%");
+
+        HorizontalLayout buttons = new HorizontalLayout();
+        for (final DemoMathElement element : DemoMathElement.values()) {
+            Button addElement = new Button(element.html);
+            addElement.addListener(new Button.ClickListener() {
+
+                private static final long serialVersionUID = 8684915066987587726L;
+
+                public void buttonClick(ClickEvent event) {
+                    targetField.addMathElement(element.element);
+                }
+            });
+            buttons.addComponent(addElement);
+        }
+
+        VerticalLayout buttonsAndField = new VerticalLayout();
+        buttonsAndField.addComponent(buttons);
+        buttonsAndField.addComponent(targetField);
+
+        Panel panel = new Panel("");
+        panel.setWidth("100%");
+        ((AbstractOrderedLayout) panel.getContent()).setSpacing(true);
+        panel.addComponent(mathElementHeader);
+        panel.addComponent(new Label(
+                "You can also add predefined math elements to a MathTextField. Try adding elements with and without selecting text first."));
+        panel.addComponent(buttonsAndField);
+
+        return panel;
     }
 }

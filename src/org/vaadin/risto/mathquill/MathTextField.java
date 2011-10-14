@@ -32,6 +32,10 @@ public class MathTextField extends AbstractField {
     private boolean mixedMode;
     private MathElement elementToAdd;
 
+    public MathTextField() {
+        this(null);
+    }
+
     public MathTextField(String caption) {
         this(caption, null);
     }
@@ -45,7 +49,15 @@ public class MathTextField extends AbstractField {
     public void paintContent(PaintTarget target) throws PaintException {
         super.paintContent(target);
 
-        if (hasValue()) {
+        // paint either the pending math element, or the value, not both
+        if (hasPendingMathElement()) {
+            target.startTag("newMathElement");
+            target.addAttribute(Communication.ATT_ELEMENTLATEX,
+                    elementToAdd.getLatex());
+            target.endTag(Communication.TAG_MATHELEMENT);
+
+            clearPendingMathElement();
+        } else if (hasValue()) {
             target.addVariable(this, Communication.ATT_CONTENT, getValue());
         }
 
@@ -61,7 +73,7 @@ public class MathTextField extends AbstractField {
         }
     }
 
-    private boolean hasValue() {
+    public boolean hasValue() {
         return getValue() != null && !"".equals(getValue());
     }
 
@@ -84,7 +96,7 @@ public class MathTextField extends AbstractField {
 
     @Override
     public void setPropertyDataSource(Property newDataSource) {
-        if (newDataSource.getType() != String.class) {
+        if (newDataSource != null && newDataSource.getType() != String.class) {
             throw new IllegalArgumentException(
                     "Datasources of MathTextField must be of type String. Given: "
                             + newDataSource);
@@ -118,5 +130,13 @@ public class MathTextField extends AbstractField {
     public void addMathElement(MathElement mathElement) {
         elementToAdd = mathElement;
         requestRepaint();
+    }
+
+    protected boolean hasPendingMathElement() {
+        return elementToAdd != null;
+    }
+
+    protected void clearPendingMathElement() {
+        elementToAdd = null;
     }
 }

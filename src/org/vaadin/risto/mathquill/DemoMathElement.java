@@ -9,8 +9,9 @@ package org.vaadin.risto.mathquill;
  */
 public enum DemoMathElement {
 
-    ALPHA("&alpha;", new MathElement("\\alpha")), BETA("&beta;",
-            new MathElement("\\beta"));
+    ALPHA("alpha", new MathElement("\\alpha")), BETA("beta", new MathElement(
+            "\\beta")), FRACTION("fraction", new MathElement("\\frac{}{}")), SQRT(
+            "square root", new MathElement("\\sqrt{}"));
 
     public final String html;
     public final MathElement element;

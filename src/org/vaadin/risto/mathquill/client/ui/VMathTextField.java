@@ -18,6 +18,8 @@ public class VMathTextField extends HTML implements Paintable {
 
     public static final String CLASSNAME = "v-mathtextfield";
 
+    public static final String CONTENTMARKER = "{}";
+
     /** The client side widget identifier */
     protected String paintableId;
 
@@ -72,6 +74,7 @@ public class VMathTextField extends HTML implements Paintable {
     }
 
     protected void fireFocusLost() {
+        doSizeUpdates();
         String value = MathJsBridge.getMathValue(innerElement);
         client.updateVariable(paintableId, Communication.ATT_CONTENT, value,
                 immediate);
@@ -95,29 +98,83 @@ public class VMathTextField extends HTML implements Paintable {
             return;
         }
 
+        // should we resize at the end of update
+        boolean needsResize = false;
+
         this.client = client;
 
         paintableId = uidl.getId();
 
         boolean serverMixedMode = uidl
                 .getBooleanAttribute(Communication.ATT_MIXEDMODE);
-        String serverContent = uidl
-                .getStringVariable(Communication.ATT_CONTENT);
 
-        if (serverMixedMode != mixedMode) {
-            mixedMode = serverMixedMode;
+        // if uidl contains both a new mathelement and content, the mathelement
+        // takes precedence
+        if (uidl.getChildByTagName(Communication.TAG_MATHELEMENT) != null) {
+            UIDL newMathElement = uidl
+                    .getChildByTagName(Communication.TAG_MATHELEMENT);
+            String latex = newMathElement
+                    .getStringAttribute(Communication.ATT_ELEMENTLATEX);
 
-            resetInnerElement(serverContent);
+            insertNewElement(latex);
 
-            if (mixedMode) {
-                MathJsBridge.mathifyTextBox(innerElement);
+        } else if (uidl.hasVariable(Communication.ATT_CONTENT)) {
+            String serverContent = uidl
+                    .getStringVariable(Communication.ATT_CONTENT);
+
+            if (serverMixedMode != mixedMode) {
+                mixedMode = serverMixedMode;
+
+                resetInnerElement(serverContent);
+
+                if (mixedMode) {
+                    MathJsBridge.mathifyTextBox(innerElement);
+                } else {
+                    MathJsBridge.mathifyEditable(innerElement);
+                }
             } else {
-                MathJsBridge.mathifyEditable(innerElement);
+                MathJsBridge.setMathContent(innerElement, serverContent);
             }
-        } else {
-            MathJsBridge.setMathContent(innerElement, serverContent);
+
+            MathJsBridge.blurElement(innerElement);
+            needsResize = true;
         }
 
+        if (needsResize) {
+            doSizeUpdates();
+        }
+    }
+
+    protected void insertNewElement(String latex) {
+        int stepBackCount = calculateStepBack(latex);
+
+        if (MathJsBridge.hasSelection(innerElement) && stepBackCount > 0) {
+            String selection = MathJsBridge.getSelection(innerElement);
+            if (latex.endsWith("{}")) {
+                latex = latex.replaceFirst("\\{\\}", "{" + selection + "}");
+
+            }
+            MathJsBridge.insertMath(innerElement, latex);
+            MathJsBridge.stepBack(innerElement, stepBackCount - 1);
+
+        } else {
+            MathJsBridge.insertMath(innerElement, latex);
+            MathJsBridge.stepBack(innerElement, stepBackCount);
+        }
+
+        MathJsBridge.focusElement(innerElement);
+    }
+
+    protected int calculateStepBack(String latex) {
+        if (!latex.endsWith(CONTENTMARKER)) {
+            return 0;
+        } else {
+            return 1 + calculateStepBack(latex.substring(0, latex.length()
+                    - CONTENTMARKER.length()));
+        }
+    }
+
+    protected void doSizeUpdates() {
         Util.notifyParentOfSizeChange(this, true);
 
         Scheduler.get().scheduleDeferred(new ScheduledCommand() {
@@ -128,7 +185,7 @@ public class VMathTextField extends HTML implements Paintable {
         });
     }
 
-    private void resetInnerElement(String serverContent) {
+    protected void resetInnerElement(String serverContent) {
         getElement().removeChild(innerElement);
         innerElement = DOM.createSpan();
         innerElement.setInnerHTML(serverContent);

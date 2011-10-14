@@ -9,6 +9,8 @@ package org.vaadin.risto.mathquill.client.ui;
 public class Communication {
 
     public static final String ATT_MIXEDMODE = "mixedmode";
-    public static String ATT_CONTENT = "content";
+    public static final String ATT_ELEMENTLATEX = "elementLatex";
+    public static final String ATT_CONTENT = "content";
+    public static final String TAG_MATHELEMENT = "newMathElement";
 
 }
