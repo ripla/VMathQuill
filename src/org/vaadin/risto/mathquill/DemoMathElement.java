@@ -9,14 +9,13 @@ package org.vaadin.risto.mathquill;
  */
 public enum DemoMathElement {
 
-    ALPHA("alpha", new MathElement("\\alpha")), BETA("beta", new MathElement(
-            "\\beta")), FRACTION("fraction", new MathElement("\\frac{}{}")), SQRT(
-            "square root", new MathElement("\\sqrt{}"));
+    ALPHA("alpha", "\\alpha"), BETA("beta", "\\beta"), FRACTION("fraction",
+            "\\frac{}{}"), SQRT("square root", "\\sqrt{}");
 
     public final String html;
-    public final MathElement element;
+    public final String element;
 
-    private DemoMathElement(String html, MathElement element) {
+    private DemoMathElement(String html, String element) {
         this.html = html;
         this.element = element;
 

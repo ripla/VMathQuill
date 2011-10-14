@@ -11,17 +11,23 @@ import com.vaadin.ui.AbstractField;
 
 /**
  * <p>
- * TextField that uses the MathQuill javascript library to render editable math
+ * Field that uses the MathQuill javascript library to render editable math
  * symbols in the browser.
  * </p>
  * 
  * <p>
- * This textfield supports two modes: mixed and normal. When in normal (default)
- * mode, everything typed in this field is rendered as math. But when this field
- * is set into mixed mode, only content between <code>$</code> signs is
- * rendered.
+ * This text field supports two modes: mixed and normal. When in normal
+ * (default) mode, everything typed in this field is rendered as math. But when
+ * this field is set into mixed mode, only content between <code>$</code> signs
+ * is rendered. See {@link #setMixedMode(boolean)}
  * </p>
  * 
+ * <p>
+ * MathTextField also supports adding math elements to the current cursor
+ * position. See {@link #addMathElement(String)}
+ * </p>
+ * 
+ * @author Risto Yrjänä / Vaadin Ltd.
  * @see MathLabel
  * @see <a href="https://github.com/laughinghan/mathquill">MathQuill@GitHub</a>
  */
@@ -30,7 +36,7 @@ public class MathTextField extends AbstractField {
 
     private static final long serialVersionUID = 1446152150503621276L;
     private boolean mixedMode;
-    private MathElement elementToAdd;
+    private String elementToAdd;
 
     public MathTextField() {
         this(null);
@@ -52,8 +58,7 @@ public class MathTextField extends AbstractField {
         // paint either the pending math element, or the value, not both
         if (hasPendingMathElement()) {
             target.startTag("newMathElement");
-            target.addAttribute(Communication.ATT_ELEMENTLATEX,
-                    elementToAdd.getLatex());
+            target.addAttribute(Communication.ATT_ELEMENTLATEX, elementToAdd);
             target.endTag(Communication.TAG_MATHELEMENT);
 
             clearPendingMathElement();
@@ -124,10 +129,19 @@ public class MathTextField extends AbstractField {
     }
 
     /**
+     * Add a math element to the current (or last) cursor position. If the
+     * element contains content markers, "{}", then the cursor will be moved to
+     * the first one.
+     * 
+     * If the user has selected text, the text is either replaced or placed
+     * inside the first content marker.
      * 
      * @param mathElement
      */
-    public void addMathElement(MathElement mathElement) {
+    public void addMathElement(String mathElement) {
+        if (mathElement == null || mathElement.isEmpty()) {
+            throw new IllegalArgumentException("Math element cannot be empty");
+        }
         elementToAdd = mathElement;
         requestRepaint();
     }

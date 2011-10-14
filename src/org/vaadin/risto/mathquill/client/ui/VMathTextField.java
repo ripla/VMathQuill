@@ -11,6 +11,7 @@ import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.vaadin.terminal.gwt.client.ApplicationConnection;
 import com.vaadin.terminal.gwt.client.Paintable;
+import com.vaadin.terminal.gwt.client.RenderSpace;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.Util;
 
@@ -38,6 +39,8 @@ public class VMathTextField extends HTML implements Paintable {
 
     private final EventHandler eventHandler;
 
+    private final RenderSpace innerSize;
+
     public VMathTextField() {
         super();
         setStyleName(CLASSNAME);
@@ -47,49 +50,9 @@ public class VMathTextField extends HTML implements Paintable {
         innerElement = DOM.createSpan();
         getElement().appendChild(innerElement);
         MathJsBridge.mathifyEditable(innerElement);
-    }
 
-    @Override
-    protected void onAttach() {
-        super.onAttach();
-        handlerRegistration = Event
-                .addNativePreviewHandler(new NativePreviewHandler() {
-                    public void onPreviewNativeEvent(NativePreviewEvent event) {
-                        handlePreviewEvent(event);
-                    }
-
-                });
-    }
-
-    protected void handlePreviewEvent(NativePreviewEvent event) {
-        if (eventHandler.validEventTargetsThis(getElement(), event)) {
-            if (!hasFocus) {
-                hasFocus = true;
-            }
-        } else if (hasFocus
-                && eventHandler.shouldLoseFocusFor(getElement(), event)) {
-            hasFocus = false;
-            fireFocusLost();
-        }
-    }
-
-    protected void fireFocusLost() {
-        doSizeUpdates();
-        String value = MathJsBridge.getMathValue(innerElement);
-        client.updateVariable(paintableId, Communication.ATT_CONTENT, value,
-                immediate);
-    }
-
-    @Override
-    protected void onDetach() {
-        removeHandler();
-        super.onDetach();
-    }
-
-    protected void removeHandler() {
-        if (handlerRegistration != null) {
-            handlerRegistration.removeHandler();
-        }
+        // currently only the height is stored
+        innerSize = new RenderSpace();
     }
 
     public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
@@ -145,6 +108,84 @@ public class VMathTextField extends HTML implements Paintable {
         }
     }
 
+    @Override
+    protected void onAttach() {
+        super.onAttach();
+        handlerRegistration = Event
+                .addNativePreviewHandler(new NativePreviewHandler() {
+                    public void onPreviewNativeEvent(NativePreviewEvent event) {
+                        handlePreviewEvent(event);
+                    }
+
+                });
+    }
+
+    @Override
+    protected void onDetach() {
+        removeHandler();
+        super.onDetach();
+    }
+
+    protected void removeHandler() {
+        if (handlerRegistration != null) {
+            handlerRegistration.removeHandler();
+        }
+    }
+
+    /**
+     * Handles native events. Used for focus and size handling
+     * 
+     * @param event
+     */
+    protected void handlePreviewEvent(NativePreviewEvent event) {
+        if (eventHandler.validEventTargetsThis(getElement(), event)) {
+            if (!hasFocus) {
+                hasFocus = true;
+            }
+            if (eventHandler.isKeyboardEvent(event)) {
+                checkForSizeChanges();
+            }
+        } else if (hasFocus
+                && eventHandler.shouldLoseFocusFor(getElement(), event)) {
+            hasFocus = false;
+            fireFocusLost();
+        }
+    }
+
+    /**
+     * Checks if the math element has grown in height and updates accordingly.
+     * Works around the way Vaadin handles undefined sizes.
+     * 
+     * TODO consider removing this in the future
+     */
+    protected void checkForSizeChanges() {
+        int currentHeight = innerElement.getOffsetHeight();
+
+        if (currentHeight != innerSize.getHeight()) {
+            innerSize.setHeight(currentHeight);
+            doSizeUpdates();
+        }
+    }
+
+    /**
+     * Handle lost focus, update new value to server etc.
+     */
+    protected void fireFocusLost() {
+        doSizeUpdates();
+        String value = MathJsBridge.getMathValue(innerElement);
+        client.updateVariable(paintableId, Communication.ATT_CONTENT, value,
+                immediate);
+    }
+
+    /**
+     * Insert a new latex element to the current cursor position. If we have a
+     * selection, the selection either replaced or put inside the first content
+     * marker.
+     * 
+     * Afterwards the math element is focused.
+     * 
+     * @param latex
+     */
     protected void insertNewElement(String latex) {
         int stepBackCount = calculateStepBack(latex);
 
@@ -165,6 +206,13 @@ public class VMathTextField extends HTML implements Paintable {
         MathJsBridge.focusElement(innerElement);
     }
 
+    /**
+     * Recursively calculate how many steps back we have to take so we can focus
+     * the first content marker
+     * 
+     * @param latex
+     * @return
+     */
     protected int calculateStepBack(String latex) {
         if (!latex.endsWith(CONTENTMARKER)) {
             return 0;
@@ -174,6 +222,10 @@ public class VMathTextField extends HTML implements Paintable {
         }
     }
 
+    /**
+     * Force Vaadin to re-calculate the parent sizes, and afterwards redraw the
+     * math.
+     */
     protected void doSizeUpdates() {
         Util.notifyParentOfSizeChange(this, true);
 
@@ -185,6 +237,11 @@ public class VMathTextField extends HTML implements Paintable {
         });
     }
 
+    /**
+     * Reset the inner math element.
+     * 
+     * @param serverContent
+     */
     protected void resetInnerElement(String serverContent) {
         getElement().removeChild(innerElement);
         innerElement = DOM.createSpan();

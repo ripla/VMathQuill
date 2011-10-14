@@ -24,6 +24,10 @@ public class EventHandler {
         return targetsThis(hostElement, event) && !isMouseMoveEvent(event);
     }
 
+    public boolean isKeyboardEvent(NativePreviewEvent event) {
+        return (event.getTypeInt() & Event.KEYEVENTS) != 0;
+    }
+
     private boolean targetsThis(Element hostElement, NativePreviewEvent event) {
         NativeEvent nativeEvent = event.getNativeEvent();
         EventTarget target = nativeEvent.getEventTarget();
@@ -34,4 +38,5 @@ public class EventHandler {
     private boolean isMouseMoveEvent(NativePreviewEvent event) {
         return (event.getTypeInt() & (Event.ONMOUSEMOVE | Event.ONMOUSEOUT | Event.ONMOUSEOVER)) != 0;
     }
+
 }
