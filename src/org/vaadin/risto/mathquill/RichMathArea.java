@@ -1,6 +1,6 @@
 package org.vaadin.risto.mathquill;
 
-import org.vaadin.risto.mathquill.client.ui.VRichMathArea;
+import org.vaadin.risto.mathquill.client.ui.matharea.VRichMathArea;
 
 import com.vaadin.ui.ClientWidget;
 import com.vaadin.ui.RichTextArea;

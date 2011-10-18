@@ -69,7 +69,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
     private boolean immediate = false;
 
-    private RichTextArea rta;
+    private RichTextArea richTextArea;
 
     private VRichTextToolbar toolbar;
 
@@ -97,7 +97,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     public VRichTextArea() {
         createRTAComponents();
         fp.add(toolbar);
-        fp.add(rta);
+        fp.add(richTextArea);
 
         initWidget(fp);
         setStyleName(CLASSNAME);
@@ -105,14 +105,14 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     }
 
     private void createRTAComponents() {
-        rta = new RichTextArea();
-        rta.setWidth("100%");
-        rta.addBlurHandler(this);
-        rta.addKeyDownHandler(this);
-        toolbar = createToolbar();
+        richTextArea = new RichTextArea();
+        richTextArea.setWidth("100%");
+        richTextArea.addBlurHandler(this);
+        richTextArea.addKeyDownHandler(this);
+        toolbar = createToolbar(richTextArea);
     }
 
-    protected VRichTextToolbar createToolbar() {
+    protected VRichTextToolbar createToolbar(RichTextArea rta) {
         return new VRichTextToolbar(rta);
     }
 
@@ -135,11 +135,11 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                 createRTAComponents(); // recreate new RTA to bypass #5379
                 fp.add(toolbar);
             }
-            rta.setHTML(currentValue);
-            fp.add(rta);
+            richTextArea.setHTML(currentValue);
+            fp.add(richTextArea);
         } else {
             html.setHTML(currentValue);
-            fp.remove(rta);
+            fp.remove(richTextArea);
             fp.add(html);
         }
     }
@@ -150,8 +150,8 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
         if (uidl.hasVariable("text")) {
             currentValue = uidl.getStringVariable("text");
-            if (rta.isAttached()) {
-                rta.setHTML(currentValue);
+            if (richTextArea.isAttached()) {
+                richTextArea.setHTML(currentValue);
             } else {
                 html.setHTML(currentValue);
             }
@@ -170,7 +170,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                 .getIntAttribute("maxLength") : -1;
         if (newMaxLength >= 0) {
             if (maxLength == -1) {
-                keyPressHandler = rta.addKeyPressHandler(this);
+                keyPressHandler = richTextArea.addKeyPressHandler(this);
             }
             maxLength = newMaxLength;
         } else if (maxLength != -1) {
@@ -202,7 +202,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         new Timer() {
             @Override
             public void run() {
-                rta.getFormatter().selectAll();
+                richTextArea.getFormatter().selectAll();
             }
         }.schedule(320);
     }
@@ -231,7 +231,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
      */
     public void synchronizeContentToServer() {
         if (client != null && id != null) {
-            final String html = rta.getHTML();
+            final String html = richTextArea.getHTML();
             if (!html.equals(currentValue)) {
                 client.updateVariable(id, "text", html, immediate);
                 currentValue = html;
@@ -297,7 +297,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         }
 
         if (height == null || height.equals("")) {
-            rta.setHeight("");
+            richTextArea.setHeight("");
         } else {
             /*
              * The formatter height will be initially calculated wrong so we
@@ -311,7 +311,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                     if (editorHeight < 0) {
                         editorHeight = 0;
                     }
-                    rta.setHeight(editorHeight + "px");
+                    richTextArea.setHeight(editorHeight + "px");
                 }
             });
         }
@@ -347,8 +347,9 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         if (maxLength >= 0) {
             Scheduler.get().scheduleDeferred(new Command() {
                 public void execute() {
-                    if (rta.getHTML().length() > maxLength) {
-                        rta.setHTML(rta.getHTML().substring(0, maxLength));
+                    if (richTextArea.getHTML().length() > maxLength) {
+                        richTextArea.setHTML(richTextArea.getHTML().substring(
+                                0, maxLength));
                     }
                 }
             });
@@ -386,11 +387,11 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     }
 
     public int getTabIndex() {
-        return rta.getTabIndex();
+        return richTextArea.getTabIndex();
     }
 
     public void setAccessKey(char key) {
-        rta.setAccessKey(key);
+        richTextArea.setAccessKey(key);
     }
 
     public void setFocus(boolean focused) {
@@ -402,13 +403,13 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
             @Override
             public void run() {
-                rta.setFocus(true);
+                richTextArea.setFocus(true);
             }
         }.schedule(300);
     }
 
     public void setTabIndex(int index) {
-        rta.setTabIndex(index);
+        richTextArea.setTabIndex(index);
     }
 
 }

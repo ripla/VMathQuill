@@ -37,7 +37,7 @@ public class VMathTextField extends HTML implements Paintable {
 
     private final boolean immediate = true;
 
-    private final EventHandler eventHandler;
+    private final VMathTextFieldEventHandler eventHandler;
 
     private final RenderSpace innerSize;
 
@@ -45,7 +45,7 @@ public class VMathTextField extends HTML implements Paintable {
         super();
         setStyleName(CLASSNAME);
 
-        eventHandler = new EventHandler();
+        eventHandler = new VMathTextFieldEventHandler();
 
         innerElement = DOM.createSpan();
         getElement().appendChild(innerElement);

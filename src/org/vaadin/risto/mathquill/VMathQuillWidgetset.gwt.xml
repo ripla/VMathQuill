@@ -6,6 +6,8 @@
 
 	<inherits name="com.vaadin.terminal.gwt.DefaultWidgetSet" />
 	
+	<stylesheet src="mathquill/matharea.css" />
+	
 	<!-- Required MathQuill client-side files -->
 	<script src="mathquill/mathquill.js" />
 	<stylesheet src="mathquill/mathquill.css" />

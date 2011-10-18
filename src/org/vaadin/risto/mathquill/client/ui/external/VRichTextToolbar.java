@@ -39,44 +39,44 @@ public class VRichTextToolbar extends Composite {
             RichTextArea.FontSize.LARGE, RichTextArea.FontSize.X_LARGE,
             RichTextArea.FontSize.XX_LARGE };
 
-    private final Images images = createImageBundle();
+    protected final Images images = createImageBundle();
 
-    private final Strings strings = createStringBundle();
+    protected final Strings strings = createStringBundle();
 
-    private final EventHandler handler = new EventHandler(this);
+    protected VRichTextAreaEventHandler handler;
 
-    final RichTextArea richText;
+    private RichTextArea richText;
     @SuppressWarnings("deprecation")
-    final RichTextArea.BasicFormatter basic;
+    private RichTextArea.BasicFormatter basic;
     @SuppressWarnings("deprecation")
-    final RichTextArea.ExtendedFormatter extended;
+    private RichTextArea.ExtendedFormatter extended;
 
-    private final FlowPanel outer = new FlowPanel();
-    private final FlowPanel topPanel = new FlowPanel();
-    private final FlowPanel bottomPanel = new FlowPanel();
-    ToggleButton bold;
-    ToggleButton italic;
-    ToggleButton underline;
-    ToggleButton subscript;
-    ToggleButton superscript;
-    ToggleButton strikethrough;
-    PushButton indent;
-    PushButton outdent;
-    PushButton justifyLeft;
-    PushButton justifyCenter;
-    PushButton justifyRight;
-    PushButton hr;
-    PushButton ol;
-    PushButton ul;
-    PushButton insertImage;
-    PushButton createLink;
-    PushButton removeLink;
-    PushButton removeFormat;
+    protected final FlowPanel outer = new FlowPanel();
+    protected final FlowPanel topPanel = new FlowPanel();
+    protected final FlowPanel bottomPanel = new FlowPanel();
+    protected ToggleButton bold;
+    protected ToggleButton italic;
+    protected ToggleButton underline;
+    protected ToggleButton subscript;
+    protected ToggleButton superscript;
+    protected ToggleButton strikethrough;
+    protected PushButton indent;
+    protected PushButton outdent;
+    protected PushButton justifyLeft;
+    protected PushButton justifyCenter;
+    protected PushButton justifyRight;
+    protected PushButton hr;
+    protected PushButton ol;
+    protected PushButton ul;
+    protected PushButton insertImage;
+    protected PushButton createLink;
+    protected PushButton removeLink;
+    protected PushButton removeFormat;
 
-    ListBox backColors;
-    ListBox foreColors;
-    ListBox fonts;
-    ListBox fontSizes;
+    protected ListBox backColors;
+    protected ListBox foreColors;
+    protected ListBox fonts;
+    protected ListBox fontSizes;
 
     /**
      * Creates a new toolbar that drives the given rich text area.
@@ -86,10 +86,10 @@ public class VRichTextToolbar extends Composite {
      */
     @SuppressWarnings("deprecation")
     public VRichTextToolbar(RichTextArea richText) {
-        this.richText = richText;
-        basic = richText.getBasicFormatter();
-        extended = richText.getExtendedFormatter();
-
+        this.setRichText(richText);
+        setBasic(richText.getBasicFormatter());
+        setExtended(richText.getExtendedFormatter());
+        handler = createEventHandler();
         outer.add(topPanel);
         outer.add(bottomPanel);
         topPanel.setStyleName("gwt-RichTextToolbar-top");
@@ -98,32 +98,36 @@ public class VRichTextToolbar extends Composite {
         initWidget(outer);
         setStyleName("gwt-RichTextToolbar");
 
-        if (basic != null) {
-            createBasicTopPanel();
+        if (getBasic() != null) {
+            createBasicTopPanel(topPanel);
         }
 
-        if (extended != null) {
-            createExtendedTopPanel();
+        if (getExtended() != null) {
+            createExtendedTopPanel(topPanel);
         }
 
-        if (basic != null) {
-            createBasicBottomPanel(richText);
+        if (getBasic() != null) {
+            createBasicBottomPanel(bottomPanel);
+
+            // We only use these handlers for updating status, so don't hook
+            // them up unless at least basic editing is supported.
+            richText.addKeyUpHandler(handler);
+            richText.addClickHandler(handler);
         }
     }
 
-    protected void createBasicBottomPanel(RichTextArea richText) {
+    protected VRichTextAreaEventHandler createEventHandler() {
+        return new VRichTextAreaEventHandler(this);
+    }
+
+    protected void createBasicBottomPanel(FlowPanel bottomPanel) {
         bottomPanel.add(backColors = createColorList("Background"));
         bottomPanel.add(foreColors = createColorList("Foreground"));
         bottomPanel.add(fonts = createFontList());
         bottomPanel.add(fontSizes = createFontSizes());
-
-        // We only use these handlers for updating status, so don't hook
-        // them up unless at least basic editing is supported.
-        richText.addKeyUpHandler(handler);
-        richText.addClickHandler(handler);
     }
 
-    protected void createExtendedTopPanel() {
+    protected void createExtendedTopPanel(FlowPanel topPanel) {
         topPanel.add(strikethrough = createToggleButton(images.strikeThrough(),
                 strings.strikeThrough()));
         topPanel.add(indent = createPushButton(images.indent(),
@@ -143,7 +147,7 @@ public class VRichTextToolbar extends Composite {
                 strings.removeFormat()));
     }
 
-    protected void createBasicTopPanel() {
+    protected void createBasicTopPanel(FlowPanel topPanel) {
         topPanel.add(bold = createToggleButton(images.bold(), strings.bold()));
         topPanel.add(italic = createToggleButton(images.italic(),
                 strings.italic()));
@@ -240,16 +244,40 @@ public class VRichTextToolbar extends Composite {
      */
     @SuppressWarnings("deprecation")
     void updateStatus() {
-        if (basic != null) {
-            bold.setDown(basic.isBold());
-            italic.setDown(basic.isItalic());
-            underline.setDown(basic.isUnderlined());
-            subscript.setDown(basic.isSubscript());
-            superscript.setDown(basic.isSuperscript());
+        if (getBasic() != null) {
+            bold.setDown(getBasic().isBold());
+            italic.setDown(getBasic().isItalic());
+            underline.setDown(getBasic().isUnderlined());
+            subscript.setDown(getBasic().isSubscript());
+            superscript.setDown(getBasic().isSuperscript());
         }
 
-        if (extended != null) {
-            strikethrough.setDown(extended.isStrikethrough());
+        if (getExtended() != null) {
+            strikethrough.setDown(getExtended().isStrikethrough());
         }
+    }
+
+    public RichTextArea.BasicFormatter getBasic() {
+        return basic;
+    }
+
+    public void setBasic(RichTextArea.BasicFormatter basic) {
+        this.basic = basic;
+    }
+
+    public RichTextArea.ExtendedFormatter getExtended() {
+        return extended;
+    }
+
+    public void setExtended(RichTextArea.ExtendedFormatter extended) {
+        this.extended = extended;
+    }
+
+    public RichTextArea getRichText() {
+        return richText;
+    }
+
+    public void setRichText(RichTextArea richText) {
+        this.richText = richText;
     }
 }

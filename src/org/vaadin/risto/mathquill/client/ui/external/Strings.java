@@ -78,4 +78,7 @@ public interface Strings extends Constants {
     String xxsmall();
 
     String yellow();
+
+    String mathify();
+
 }

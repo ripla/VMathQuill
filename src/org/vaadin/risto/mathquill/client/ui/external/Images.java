@@ -46,4 +46,6 @@ public interface Images extends ClientBundle {
     ImageResource ul();
 
     ImageResource underline();
+
+    ImageResource mathify();
 }

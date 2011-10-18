@@ -12,7 +12,7 @@ import com.google.gwt.user.client.Event.NativePreviewEvent;
  * @author Risto Yrjänä / Vaadin Ltd.
  * 
  */
-public class EventHandler {
+public class VMathTextFieldEventHandler {
 
     public boolean shouldLoseFocusFor(Element hostElement,
             NativePreviewEvent event) {
