@@ -164,15 +164,24 @@ public class MathQuillDemoApplication extends Application {
     }
 
     private Component buildRichMathEditorDemo() {
+        ObjectProperty<String> exampleDatasource = new ObjectProperty<String>(
+                "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
+
         Label mathElementHeader = new Label("RichTextEditor with math support");
         mathElementHeader.setStyleName(Reindeer.LABEL_H1);
 
+        MathLabel mathContent = new MathLabel();
+        mathContent.setPropertyDataSource(exampleDatasource);
+
         RichMathArea richEditor = new RichMathArea();
+        richEditor.setImmediate(true);
+        richEditor.setPropertyDataSource(exampleDatasource);
 
         VerticalLayout layout = createBasicDemoContainer();
         layout.addComponent(mathElementHeader);
         layout.addComponent(new Label(
                 "Vaadin RichTextArea with embedded MathQuill support."));
+        layout.addComponent(mathContent);
         layout.addComponent(richEditor);
 
         return layout;

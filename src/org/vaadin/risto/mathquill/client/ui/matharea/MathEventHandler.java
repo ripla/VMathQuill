@@ -21,6 +21,12 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
                 if (yes) {
                     String latex = mathPopup.getLatexValue();
                     getTextArea().getFormatter().insertHTML(latex);
+
+                    // experimental
+                    // Element span = DOM.createSpan();
+                    // MathJsBridge.makeMathElement(span);
+                    // MathJsBridge.setMathContent(span, latex);
+                    // RichTextJs.append(textArea.getElement(), span);
                 }
             }
         });
@@ -42,6 +48,8 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
             } else {
                 mathPopup.setButtonText("Add");
             }
+        } else {
+            super.onClick(event);
         }
     }
 

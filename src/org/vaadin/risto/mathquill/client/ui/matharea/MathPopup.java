@@ -2,6 +2,8 @@ package org.vaadin.risto.mathquill.client.ui.matharea;
 
 import org.vaadin.risto.mathquill.client.ui.MathJsBridge;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -39,6 +41,12 @@ public class MathPopup extends PopupPanel {
         mathBox.getElement().appendChild(mathTextBox);
         MathJsBridge.mathifyEditable(mathTextBox);
         MathJsBridge.setMathContent(mathTextBox, contents);
+        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+
+            public void execute() {
+                MathJsBridge.updateMath(mathTextBox);
+            }
+        });
 
         yes = new Button();
         yes.addStyleName(PRIMARYSTYLENAME + "-yes");
