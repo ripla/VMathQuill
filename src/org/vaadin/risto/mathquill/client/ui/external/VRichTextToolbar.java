@@ -257,18 +257,22 @@ public class VRichTextToolbar extends Composite {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public RichTextArea.BasicFormatter getBasic() {
         return basic;
     }
 
+    @SuppressWarnings("deprecation")
     public void setBasic(RichTextArea.BasicFormatter basic) {
         this.basic = basic;
     }
 
+    @SuppressWarnings("deprecation")
     public RichTextArea.ExtendedFormatter getExtended() {
         return extended;
     }
 
+    @SuppressWarnings("deprecation")
     public void setExtended(RichTextArea.ExtendedFormatter extended) {
         this.extended = extended;
     }
