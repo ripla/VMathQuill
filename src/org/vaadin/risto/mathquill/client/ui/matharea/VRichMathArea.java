@@ -15,4 +15,18 @@ public class VRichMathArea extends VRichTextArea {
     protected String getSelection() {
         return RichTextJs.getSelection(getElement()).get(0);
     }
+
+    @Override
+    protected void onAttach() {
+        super.onAttach();
+        // Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+        //
+        // public void execute() {
+        // RichTextJs
+        // .disableObjectResizing(getRichTextArea().getElement());
+        // }
+        //
+        // });
+
+    }
 }

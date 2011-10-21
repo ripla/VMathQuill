@@ -97,7 +97,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     public VRichTextArea() {
         createRTAComponents();
         fp.add(toolbar);
-        fp.add(richTextArea);
+        fp.add(getRichTextArea());
 
         initWidget(fp);
         setStyleName(CLASSNAME);
@@ -105,11 +105,11 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     }
 
     private void createRTAComponents() {
-        richTextArea = new RichTextArea();
-        richTextArea.setWidth("100%");
-        richTextArea.addBlurHandler(this);
-        richTextArea.addKeyDownHandler(this);
-        toolbar = createToolbar(richTextArea);
+        setRichTextArea(new RichTextArea());
+        getRichTextArea().setWidth("100%");
+        getRichTextArea().addBlurHandler(this);
+        getRichTextArea().addKeyDownHandler(this);
+        toolbar = createToolbar(getRichTextArea());
     }
 
     protected VRichTextToolbar createToolbar(RichTextArea rta) {
@@ -135,11 +135,11 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                 createRTAComponents(); // recreate new RTA to bypass #5379
                 fp.add(toolbar);
             }
-            richTextArea.setHTML(currentValue);
-            fp.add(richTextArea);
+            getRichTextArea().setHTML(currentValue);
+            fp.add(getRichTextArea());
         } else {
             html.setHTML(currentValue);
-            fp.remove(richTextArea);
+            fp.remove(getRichTextArea());
             fp.add(html);
         }
     }
@@ -150,8 +150,8 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
         if (uidl.hasVariable("text")) {
             currentValue = uidl.getStringVariable("text");
-            if (richTextArea.isAttached()) {
-                richTextArea.setHTML(currentValue);
+            if (getRichTextArea().isAttached()) {
+                getRichTextArea().setHTML(currentValue);
             } else {
                 html.setHTML(currentValue);
             }
@@ -170,7 +170,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                 .getIntAttribute("maxLength") : -1;
         if (newMaxLength >= 0) {
             if (maxLength == -1) {
-                keyPressHandler = richTextArea.addKeyPressHandler(this);
+                keyPressHandler = getRichTextArea().addKeyPressHandler(this);
             }
             maxLength = newMaxLength;
         } else if (maxLength != -1) {
@@ -202,7 +202,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         new Timer() {
             @Override
             public void run() {
-                richTextArea.getFormatter().selectAll();
+                getRichTextArea().getFormatter().selectAll();
             }
         }.schedule(320);
     }
@@ -231,7 +231,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
      */
     public void synchronizeContentToServer() {
         if (client != null && id != null) {
-            final String html = richTextArea.getHTML();
+            final String html = getRichTextArea().getHTML();
             if (!html.equals(currentValue)) {
                 client.updateVariable(id, "text", html, immediate);
                 currentValue = html;
@@ -297,7 +297,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         }
 
         if (height == null || height.equals("")) {
-            richTextArea.setHeight("");
+            getRichTextArea().setHeight("");
         } else {
             /*
              * The formatter height will be initially calculated wrong so we
@@ -311,7 +311,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                     if (editorHeight < 0) {
                         editorHeight = 0;
                     }
-                    richTextArea.setHeight(editorHeight + "px");
+                    getRichTextArea().setHeight(editorHeight + "px");
                 }
             });
         }
@@ -347,8 +347,8 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         if (maxLength >= 0) {
             Scheduler.get().scheduleDeferred(new Command() {
                 public void execute() {
-                    if (richTextArea.getHTML().length() > maxLength) {
-                        richTextArea.setHTML(richTextArea.getHTML().substring(
+                    if (getRichTextArea().getHTML().length() > maxLength) {
+                        getRichTextArea().setHTML(getRichTextArea().getHTML().substring(
                                 0, maxLength));
                     }
                 }
@@ -387,11 +387,11 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     }
 
     public int getTabIndex() {
-        return richTextArea.getTabIndex();
+        return getRichTextArea().getTabIndex();
     }
 
     public void setAccessKey(char key) {
-        richTextArea.setAccessKey(key);
+        getRichTextArea().setAccessKey(key);
     }
 
     public void setFocus(boolean focused) {
@@ -403,13 +403,21 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
             @Override
             public void run() {
-                richTextArea.setFocus(true);
+                getRichTextArea().setFocus(true);
             }
         }.schedule(300);
     }
 
     public void setTabIndex(int index) {
-        richTextArea.setTabIndex(index);
+        getRichTextArea().setTabIndex(index);
+    }
+
+    public RichTextArea getRichTextArea() {
+        return richTextArea;
+    }
+
+    public void setRichTextArea(RichTextArea richTextArea) {
+        this.richTextArea = richTextArea;
     }
 
 }

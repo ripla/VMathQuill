@@ -45,6 +45,7 @@ public class MathPopup extends PopupPanel {
 
             public void execute() {
                 MathJsBridge.updateMath(mathTextBox);
+                MathJsBridge.focusElement(mathTextBox);
             }
         });
 
