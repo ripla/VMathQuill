@@ -192,6 +192,7 @@ public class VMathTextField extends HTML implements Paintable {
         if (MathJsBridge.hasSelection(innerElement) && stepBackCount > 0) {
             String selection = MathJsBridge.getSelection(innerElement);
             if (latex.endsWith("{}")) {
+                selection = quoteReplacement(selection);
                 latex = latex.replaceFirst("\\{\\}", "{" + selection + "}");
 
             }
@@ -248,6 +249,25 @@ public class VMathTextField extends HTML implements Paintable {
         innerElement.setInnerHTML(serverContent);
         getElement().appendChild(innerElement);
 
+    }
+
+    protected String quoteReplacement(String s) {
+        if ((s.indexOf('\\') == -1) && (s.indexOf('$') == -1))
+            return s;
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                sb.append('\\');
+                sb.append('\\');
+            } else if (c == '$') {
+                sb.append('\\');
+                sb.append('$');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
 }
