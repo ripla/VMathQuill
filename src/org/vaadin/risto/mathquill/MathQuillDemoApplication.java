@@ -25,7 +25,6 @@ public class MathQuillDemoApplication extends Application {
     public void init() {
         setTheme(Reindeer.THEME_NAME);
         VerticalLayout mainLayout = new VerticalLayout();
-        mainLayout.setMargin(true);
         mainLayout.setHeight("100%");
 
         Component demoLayout = buildDemoLayout();
@@ -41,23 +40,51 @@ public class MathQuillDemoApplication extends Application {
     }
 
     private Component buildDemoLayout() {
-        Panel demoLayout = new Panel();
-        ((AbstractOrderedLayout) demoLayout.getContent()).setSpacing(true);
+        Panel demoPanel = new Panel();
+        ((AbstractOrderedLayout) demoPanel.getContent()).setSpacing(true);
+        demoPanel.setHeight("100%");
 
         Component mathLabelDemo = buildMathLabelDemo();
         Component mathTextFieldDemo = buildMathTextFieldDemo();
         Component mathElementBarDemo = buildMathElementBarDemo();
         Component richMathEditorDemo = buildRichMathEditorDemo();
 
-        demoLayout.addComponent(mathLabelDemo);
-        demoLayout.addComponent(createDivider());
-        demoLayout.addComponent(mathTextFieldDemo);
-        demoLayout.addComponent(createDivider());
-        demoLayout.addComponent(mathElementBarDemo);
-        demoLayout.addComponent(createDivider());
-        demoLayout.addComponent(richMathEditorDemo);
+        demoPanel.addComponent(mathLabelDemo);
+        demoPanel.addComponent(createDivider());
+        demoPanel.addComponent(mathTextFieldDemo);
+        demoPanel.addComponent(createDivider());
+        demoPanel.addComponent(mathElementBarDemo);
+        demoPanel.addComponent(createDivider());
+        demoPanel.addComponent(richMathEditorDemo);
+
+        VerticalLayout demoLayout = createBasicDemoContainer();
+        demoLayout.setSizeFull();
+
+        demoLayout.addComponent(buildGenericHeader());
+        demoLayout.addComponent(demoPanel);
+        demoLayout.setExpandRatio(demoPanel, 1.0f);
 
         return demoLayout;
+    }
+
+    private Component buildGenericHeader() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+        layout.setSpacing(true);
+        layout.setMargin(true);
+
+        Label genericHeaderLabel = new Label("VMathQuill demo");
+        genericHeaderLabel.addStyleName(Reindeer.LABEL_H1);
+        Label genericHeaderContent = new Label(
+                "VMathQuill is a Vaadin integration of the <a href=\"http://mathquill.github.com\">MathQuill</a> javascript library. The integration sources can be found <a href=\"https://github.com/ripla/VMathQuill\">here</a>");
+        genericHeaderContent.setContentMode(Label.CONTENT_XHTML);
+
+        layout.addComponent(genericHeaderLabel);
+        layout.addComponent(genericHeaderContent);
+
+        Panel panel = new Panel();
+        panel.setContent(layout);
+        return panel;
     }
 
     private Component createDivider() {
@@ -170,25 +197,39 @@ public class MathQuillDemoApplication extends Application {
         Label mathElementHeader = new Label("RichTextEditor with math support");
         mathElementHeader.setStyleName(Reindeer.LABEL_H1);
 
-        MathLabel mathContent = new MathLabel();
-        mathContent.setCaption("MathLabel, normal mode");
-        mathContent.setPropertyDataSource(exampleDatasource);
+        final MathLabel mathContent = new MathLabel();
+
+        Label mathContentCaption = new Label("MathLabel, normal mode");
+        mathContentCaption.addStyleName(Reindeer.LABEL_H2);
 
         Label normalLabel = new Label();
         normalLabel.setPropertyDataSource(exampleDatasource);
         normalLabel.setContentMode(Label.CONTENT_XHTML);
-        normalLabel.setCaption("Vaadin Label, XHTML mode");
 
-        RichMathArea richEditor = new RichMathArea();
+        Label normalLabelCaption = new Label("Vaadin Label, XHTML mode");
+        normalLabelCaption.addStyleName(Reindeer.LABEL_H2);
+
+        final RichMathArea richEditor = new RichMathArea();
         richEditor.setImmediate(true);
         richEditor.setPropertyDataSource(exampleDatasource);
+
+        exampleDatasource.addListener(new Property.ValueChangeListener() {
+
+            private static final long serialVersionUID = 6852597702928266038L;
+
+            public void valueChange(ValueChangeEvent event) {
+                mathContent.setValue(richEditor.getMathValue());
+            }
+        });
 
         VerticalLayout layout = createBasicDemoContainer();
         layout.addComponent(mathElementHeader);
         layout.addComponent(new Label(
                 "Vaadin RichTextArea with embedded MathQuill support."));
         layout.addComponent(richEditor);
+        layout.addComponent(mathContentCaption);
         layout.addComponent(mathContent);
+        layout.addComponent(normalLabelCaption);
         layout.addComponent(normalLabel);
 
         return layout;

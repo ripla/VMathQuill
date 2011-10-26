@@ -1,6 +1,7 @@
 package org.vaadin.risto.mathquill.client.ui.matharea;
 
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 
 public class RichTextJs {
@@ -30,6 +31,10 @@ public class RichTextJs {
     public static native Element getBodyElement(Element richText) /*-{
                                                                    return richText.contentWindow.document.body;
                                                                    }-*/;
+
+    public static native Document getDocumentElement(Element richText) /*-{
+                                                                       return richText.contentWindow.document;
+                                                                       }-*/;
 
     public static native void disableObjectResizing(Element richText) /*-{
                                                                       richText.contentWindow.document.execCommand("enableObjectResizing", false, false);

@@ -19,3 +19,6 @@
 	
 }
 
+.v-richmatharea img.latexPlaceHolder {
+	cursor: pointer;
+}

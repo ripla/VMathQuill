@@ -96,7 +96,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
     public VRichTextArea() {
         createRTAComponents();
-        fp.add(toolbar);
+        fp.add(getToolbar());
         fp.add(getRichTextArea());
 
         initWidget(fp);
@@ -105,11 +105,15 @@ public class VRichTextArea extends Composite implements Paintable, Field,
     }
 
     private void createRTAComponents() {
-        setRichTextArea(new RichTextArea());
+        setRichTextArea(createRichTextArea());
         getRichTextArea().setWidth("100%");
         getRichTextArea().addBlurHandler(this);
         getRichTextArea().addKeyDownHandler(this);
-        toolbar = createToolbar(getRichTextArea());
+        setToolbar(createToolbar(getRichTextArea()));
+    }
+
+    protected RichTextArea createRichTextArea() {
+        return new RichTextArea();
     }
 
     protected VRichTextToolbar createToolbar(RichTextArea rta) {
@@ -131,9 +135,9 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         if (html.isAttached()) {
             fp.remove(html);
             if (BrowserInfo.get().isWebkit()) {
-                fp.remove(toolbar);
+                fp.remove(getToolbar());
                 createRTAComponents(); // recreate new RTA to bypass #5379
-                fp.add(toolbar);
+                fp.add(getToolbar());
             }
             getRichTextArea().setHTML(currentValue);
             fp.add(getRichTextArea());
@@ -214,7 +218,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
         }
         // reset visibility in case enabled state changed and the formatter was
         // recreated
-        toolbar.setVisible(!readOnly);
+        getToolbar().setVisible(!readOnly);
     }
 
     private boolean isReadOnly() {
@@ -307,7 +311,7 @@ public class VRichTextArea extends Composite implements Paintable, Field,
                 public void execute() {
                     int editorHeight = getOffsetHeight()
                             - getExtraVerticalPixels()
-                            - toolbar.getOffsetHeight();
+                            - getToolbar().getOffsetHeight();
                     if (editorHeight < 0) {
                         editorHeight = 0;
                     }
@@ -418,6 +422,14 @@ public class VRichTextArea extends Composite implements Paintable, Field,
 
     public void setRichTextArea(RichTextArea richTextArea) {
         this.richTextArea = richTextArea;
+    }
+
+    public VRichTextToolbar getToolbar() {
+        return toolbar;
+    }
+
+    public void setToolbar(VRichTextToolbar toolbar) {
+        this.toolbar = toolbar;
     }
 
 }

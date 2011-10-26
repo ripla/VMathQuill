@@ -32,4 +32,8 @@ public class VRichMathAreaToolbar extends VRichTextToolbar {
         return mathifyButton;
     }
 
+    @Override
+    public MathEventHandler getHandler() {
+        return (MathEventHandler) super.getHandler();
+    }
 }

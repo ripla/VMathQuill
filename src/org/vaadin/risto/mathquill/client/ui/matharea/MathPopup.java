@@ -7,6 +7,9 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -65,6 +68,17 @@ public class MathPopup extends PopupPanel {
         panel.setCellHorizontalAlignment(yes, HorizontalPanel.ALIGN_RIGHT);
 
         this.add(panel);
+
+        KeyPressHandler enterHandler = new KeyPressHandler() {
+
+            public void onKeyPress(KeyPressEvent event) {
+                if (KeyCodes.KEY_ENTER == event.getNativeEvent().getKeyCode()) {
+                    yes.click();
+                }
+
+            }
+        };
+        this.addDomHandler(enterHandler, KeyPressEvent.getType());
     }
 
     public String getLatexValue() {

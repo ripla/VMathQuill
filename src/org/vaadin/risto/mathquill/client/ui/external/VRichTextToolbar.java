@@ -43,7 +43,7 @@ public class VRichTextToolbar extends Composite {
 
     protected final Strings strings = createStringBundle();
 
-    protected VRichTextAreaEventHandler handler;
+    private VRichTextAreaEventHandler handler;
 
     private RichTextArea richText;
     @SuppressWarnings("deprecation")
@@ -89,7 +89,7 @@ public class VRichTextToolbar extends Composite {
         this.setRichText(richText);
         setBasic(richText.getBasicFormatter());
         setExtended(richText.getExtendedFormatter());
-        handler = createEventHandler();
+        setHandler(createEventHandler());
         outer.add(topPanel);
         outer.add(bottomPanel);
         topPanel.setStyleName("gwt-RichTextToolbar-top");
@@ -111,8 +111,8 @@ public class VRichTextToolbar extends Composite {
 
             // We only use these handlers for updating status, so don't hook
             // them up unless at least basic editing is supported.
-            richText.addKeyUpHandler(handler);
-            richText.addClickHandler(handler);
+            richText.addKeyUpHandler(getHandler());
+            richText.addClickHandler(getHandler());
         }
     }
 
@@ -175,7 +175,7 @@ public class VRichTextToolbar extends Composite {
 
     protected ListBox createColorList(String caption) {
         final ListBox lb = new ListBox();
-        lb.addChangeHandler(handler);
+        lb.addChangeHandler(getHandler());
         lb.setVisibleItemCount(1);
 
         lb.addItem(caption);
@@ -191,7 +191,7 @@ public class VRichTextToolbar extends Composite {
 
     protected ListBox createFontList() {
         final ListBox lb = new ListBox();
-        lb.addChangeHandler(handler);
+        lb.addChangeHandler(getHandler());
         lb.setVisibleItemCount(1);
 
         lb.addItem(strings.font(), "");
@@ -208,7 +208,7 @@ public class VRichTextToolbar extends Composite {
 
     protected ListBox createFontSizes() {
         final ListBox lb = new ListBox();
-        lb.addChangeHandler(handler);
+        lb.addChangeHandler(getHandler());
         lb.setVisibleItemCount(1);
 
         lb.addItem(strings.size());
@@ -225,7 +225,7 @@ public class VRichTextToolbar extends Composite {
 
     protected PushButton createPushButton(ImageResource img, String tip) {
         final PushButton pb = new PushButton(new Image(img));
-        pb.addClickHandler(handler);
+        pb.addClickHandler(getHandler());
         pb.setTitle(tip);
         pb.setTabIndex(-1);
         return pb;
@@ -233,7 +233,7 @@ public class VRichTextToolbar extends Composite {
 
     protected ToggleButton createToggleButton(ImageResource img, String tip) {
         final ToggleButton tb = new ToggleButton(new Image(img));
-        tb.addClickHandler(handler);
+        tb.addClickHandler(getHandler());
         tb.setTitle(tip);
         tb.setTabIndex(-1);
         return tb;
@@ -283,5 +283,13 @@ public class VRichTextToolbar extends Composite {
 
     public void setRichText(RichTextArea richText) {
         this.richText = richText;
+    }
+
+    public VRichTextAreaEventHandler getHandler() {
+        return handler;
+    }
+
+    public void setHandler(VRichTextAreaEventHandler handler) {
+        this.handler = handler;
     }
 }
