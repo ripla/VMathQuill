@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Implementation-Title: MathQuill integration
-Implementation-Version: 0.8.0
+Implementation-Version: 0.8.5
 Vaadin-Package-Version: 1
 Vaadin-Widgetsets: org.vaadin.risto.mathquill.VMathQuillWidgetset
 Class-Path: 

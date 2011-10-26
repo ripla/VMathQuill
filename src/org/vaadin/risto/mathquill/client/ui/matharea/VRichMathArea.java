@@ -9,10 +9,10 @@ import com.google.gwt.user.client.ui.RichTextArea;
 
 public class VRichMathArea extends VRichTextArea {
 
-    private static final String CLASSNAME = "v-richmatharea";
+    private static final String MATHAREA_CLASSNAME = "v-richmatharea";
 
     public VRichMathArea() {
-        addStyleName(CLASSNAME);
+        addStyleName(MATHAREA_CLASSNAME);
     }
 
     @Override

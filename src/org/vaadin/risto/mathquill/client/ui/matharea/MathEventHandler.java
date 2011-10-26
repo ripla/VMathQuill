@@ -3,6 +3,7 @@ package org.vaadin.risto.mathquill.client.ui.matharea;
 import org.vaadin.risto.mathquill.client.ui.external.VRichTextAreaEventHandler;
 
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.DOM;
@@ -16,7 +17,6 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
 
     private final RichTextArea textArea;
     private final MathPopup mathPopup;
-    private boolean objectResizingDisabled;
 
     public MathEventHandler(VRichMathAreaToolbar toolbar,
             final RichTextArea mathArea) {
@@ -49,6 +49,7 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         DOM.setElementProperty(castElement, "title", latexContent);
         DOM.setImgSrc(castElement, src);
         latexPlaceHolder.setPropertyString("className", "latexPlaceHolder");
+        latexPlaceHolder.getStyle().setCursor(Cursor.POINTER);
 
         // set element unique id
         latexPlaceHolder.setId("latexPlaceHolder_" + latexContent + "_"
