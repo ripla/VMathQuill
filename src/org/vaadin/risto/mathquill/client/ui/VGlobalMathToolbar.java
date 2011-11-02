@@ -19,6 +19,7 @@ public class VGlobalMathToolbar extends SimplePanel implements Paintable {
 
     public VGlobalMathToolbar() {
         contentPanel = new FlowPanel();
+        setWidget(contentPanel);
         getElement().setId("globalMathToolbar");
     }
 

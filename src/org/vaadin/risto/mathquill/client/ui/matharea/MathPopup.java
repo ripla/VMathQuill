@@ -39,15 +39,34 @@ public class MathPopup extends PopupPanel implements VMathField {
     private final VMathTextFieldEventHandler eventHandler;
     private boolean hasFocus;
     private HandlerRegistration handlerRegistration;
+    private Element toolbarElement;
 
     public MathPopup() {
         super(true);
         addStyleName(PRIMARYSTYLENAME);
+        eventHandler = new VMathTextFieldEventHandler();
+    }
+
+    @Override
+    public void show() {
+        // so that this is focused when first shown
+        VMathFocusHandler.setFocusedMathTextField(this);
 
         // so that clicks on the toolbar buttons don't hide this
-        addAutoHidePartner(Document.get().getElementById("globalMathToolbar"));
+        toolbarElement = Document.get().getElementById("globalMathToolbar");
+        if (toolbarElement != null) {
+            addAutoHidePartner(toolbarElement);
+        }
 
-        eventHandler = new VMathTextFieldEventHandler();
+        super.show();
+    }
+
+    @Override
+    public void hide() {
+        if (toolbarElement != null) {
+            removeAutoHidePartner(toolbarElement);
+        }
+        super.hide();
     }
 
     public void setContents(String contents) {

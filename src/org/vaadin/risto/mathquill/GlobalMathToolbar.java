@@ -9,6 +9,7 @@ import org.vaadin.risto.mathquill.client.ui.Communication;
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.ClientWidget;
 
 /**
  * Allows the use of a global toolbar for inserting pre-defined math elements
@@ -17,6 +18,7 @@ import com.vaadin.ui.AbstractComponent;
  * @author Risto Yrjänä / Vaadin Ltd.
  * 
  */
+@ClientWidget(org.vaadin.risto.mathquill.client.ui.VGlobalMathToolbar.class)
 public class GlobalMathToolbar extends AbstractComponent {
 
     private static final long serialVersionUID = 720210505373657104L;
@@ -31,6 +33,7 @@ public class GlobalMathToolbar extends AbstractComponent {
                     button.getKey());
             target.addAttribute(Communication.ATT_TOOLBARCOMMAND,
                     button.getValue());
+            target.endTag(Communication.TAG_TOOLBARBUTTONS);
         }
     }
 

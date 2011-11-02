@@ -8,11 +8,12 @@ import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
@@ -20,6 +21,8 @@ import com.vaadin.ui.themes.Reindeer;
 public class MathQuillDemoApplication extends Application {
 
     private static final long serialVersionUID = 2055422795751929484L;
+
+    private Window globalToolbarWindow = null;
 
     @Override
     public void init() {
@@ -37,6 +40,27 @@ public class MathQuillDemoApplication extends Application {
         mainWindow.setContent(mainLayout);
 
         setMainWindow(mainWindow);
+    }
+
+    protected Window createGlobalToolbarWindow(GlobalMathToolbar floatingToolbar) {
+        Window toolbarWindow = new Window("Floating toolbar");
+        toolbarWindow.setStyleName(Reindeer.WINDOW_LIGHT);
+        toolbarWindow.addComponent(floatingToolbar);
+        return toolbarWindow;
+    }
+
+    protected ClickListener createToolbarListener(
+            final GlobalMathToolbar floatingToolbar) {
+        return new Button.ClickListener() {
+
+            private static final long serialVersionUID = -4972252645127891269L;
+
+            public void buttonClick(ClickEvent event) {
+                getMainWindow().removeWindow(globalToolbarWindow);
+                globalToolbarWindow = createGlobalToolbarWindow(floatingToolbar);
+                getMainWindow().addWindow(globalToolbarWindow);
+            }
+        };
     }
 
     private Component buildDemoLayout() {
@@ -99,7 +123,7 @@ public class MathQuillDemoApplication extends Application {
         mathLabelHeader.setStyleName(Reindeer.LABEL_H1);
         Label firstExampleHeader = new Label("Example");
         firstExampleHeader.setStyleName(Reindeer.LABEL_H2);
-        TextField firstExampleSource = new TextField("Label contents",
+        TextArea firstExampleSource = new TextArea("Label contents",
                 exampleDatasource);
         firstExampleSource.setImmediate(true);
         MathLabel firstExample = new MathLabel(exampleDatasource);
@@ -187,12 +211,28 @@ public class MathQuillDemoApplication extends Application {
         buttonsAndField.addComponent(buttons);
         buttonsAndField.addComponent(targetField);
 
+        Label staticToolbarHeader = new Label("User created toolbar");
+        staticToolbarHeader.setStyleName(Reindeer.LABEL_H2);
+        Label staticToolbarText = new Label(
+                "This toolbar is a normal Vaadin HorizontalLayout. It specifically targets this MathTextField.");
+
+        Label globalToolbarHeader = new Label("Floating toolbar");
+        globalToolbarHeader.setStyleName(Reindeer.LABEL_H2);
+        Label globalToolbarText = new Label(
+                "This is a custom client side toolbar. It can target any focused math field.");
+
+        Button openGlobalToolbar = new Button("Open floating toolbar");
+        openGlobalToolbar.addListener(createToolbarListener(floatingToolbar));
         VerticalLayout layout = createBasicDemoContainer();
         layout.addComponent(mathElementHeader);
         layout.addComponent(new Label(
                 "You can also add predefined math elements to a MathTextField. Try adding elements with and without selecting text first."));
+        layout.addComponent(staticToolbarHeader);
+        layout.addComponent(staticToolbarText);
         layout.addComponent(buttonsAndField);
-
+        layout.addComponent(globalToolbarHeader);
+        layout.addComponent(globalToolbarText);
+        layout.addComponent(openGlobalToolbar);
         return layout;
     }
 
@@ -250,7 +290,7 @@ public class MathQuillDemoApplication extends Application {
             exampleDatasource = new ObjectProperty<String>(
                     "\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}");
         }
-        final TextField exampleSource = new TextField("Field contents",
+        final TextArea exampleSource = new TextArea("Field contents",
                 exampleDatasource);
         exampleSource.setImmediate(true);
 

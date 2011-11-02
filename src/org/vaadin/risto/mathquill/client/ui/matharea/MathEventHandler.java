@@ -23,7 +23,6 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         super(toolbar);
         this.textArea = mathArea;
         mathPopup = new MathPopup();
-
     }
 
     protected Element createLatexPlaceholder(final String latexContent) {
@@ -80,27 +79,28 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
             }
 
         });
-        getMathPopup().setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+        getMathPopup().setPopupPositionAndShow(
+                new PopupPanel.PositionCallback() {
 
-            public void setPosition(int offsetWidth, int offsetHeight) {
-                int trueAbsoluteLeft = targetElement.getAbsoluteLeft()
-                        + textArea.getAbsoluteLeft();
+                    public void setPosition(int offsetWidth, int offsetHeight) {
+                        int trueAbsoluteLeft = targetElement.getAbsoluteLeft()
+                                + textArea.getAbsoluteLeft();
 
-                int trueAbsoluteTop = targetElement.getAbsoluteTop()
-                        + textArea.getAbsoluteTop();
+                        int trueAbsoluteTop = targetElement.getAbsoluteTop()
+                                + textArea.getAbsoluteTop();
 
-                int elementHorizontalCenter = trueAbsoluteLeft
-                        + targetElement.getOffsetWidth() / 2;
+                        int elementHorizontalCenter = trueAbsoluteLeft
+                                + targetElement.getOffsetWidth() / 2;
 
-                int elementVerticalCenter = trueAbsoluteTop
-                        + targetElement.getOffsetHeight() / 2;
+                        int elementVerticalCenter = trueAbsoluteTop
+                                + targetElement.getOffsetHeight() / 2;
 
-                int left = elementHorizontalCenter - offsetWidth / 2;
-                int top = elementVerticalCenter - offsetHeight / 2;
+                        int left = elementHorizontalCenter - offsetWidth / 2;
+                        int top = elementVerticalCenter - offsetHeight / 2;
 
-                getMathPopup().setPopupPosition(left, top);
-            }
-        });
+                        getMathPopup().setPopupPosition(left, top);
+                    }
+                });
 
     }
 
