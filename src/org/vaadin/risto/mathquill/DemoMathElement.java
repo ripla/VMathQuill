@@ -13,11 +13,11 @@ public enum DemoMathElement {
             "\\frac{}{}"), SQRT("square root", "\\sqrt{}");
 
     public final String html;
-    public final String element;
+    public final String latex;
 
     private DemoMathElement(String html, String element) {
         this.html = html;
-        this.element = element;
+        this.latex = element;
 
     }
 }

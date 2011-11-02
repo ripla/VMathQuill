@@ -14,8 +14,7 @@ import com.google.gwt.user.client.Event.NativePreviewEvent;
  */
 public class VMathTextFieldEventHandler {
 
-    public boolean shouldLoseFocusFor(Element hostElement,
-            NativePreviewEvent event) {
+    public boolean shouldLoseFocusFor(NativePreviewEvent event) {
         return !isMouseMoveEvent(event);
     }
 
@@ -39,4 +38,7 @@ public class VMathTextFieldEventHandler {
         return (event.getTypeInt() & (Event.ONMOUSEMOVE | Event.ONMOUSEOUT | Event.ONMOUSEOVER)) != 0;
     }
 
+    public boolean isValidCursorRefreshEvent(NativePreviewEvent event) {
+        return (event.getTypeInt() & (Event.ONCLICK | Event.KEYEVENTS)) != 0;
+    }
 }

@@ -164,17 +164,23 @@ public class MathQuillDemoApplication extends Application {
         targetField.setWidth("100%");
 
         HorizontalLayout buttons = new HorizontalLayout();
+        GlobalMathToolbar floatingToolbar = new GlobalMathToolbar();
+
         for (final DemoMathElement element : DemoMathElement.values()) {
+            // static math element bar
             Button addElement = new Button(element.html);
             addElement.addListener(new Button.ClickListener() {
 
                 private static final long serialVersionUID = 8684915066987587726L;
 
                 public void buttonClick(ClickEvent event) {
-                    targetField.addMathElement(element.element);
+                    targetField.addMathElement(element.latex);
                 }
             });
             buttons.addComponent(addElement);
+
+            // floating math element bar
+            floatingToolbar.addButton(element.html, element.latex);
         }
 
         VerticalLayout buttonsAndField = new VerticalLayout();

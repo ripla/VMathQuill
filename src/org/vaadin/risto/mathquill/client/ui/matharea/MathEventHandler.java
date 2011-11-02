@@ -64,14 +64,14 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
 
     private void createAndShowEditPopup(final Element targetElement,
             String latexContent) {
-        mathPopup.hide();
+        getMathPopup().hide();
 
-        mathPopup.setContents(latexContent);
-        mathPopup.setButtonText("Apply");
-        mathPopup.setCallback(new MathPopup.Callback() {
+        getMathPopup().setContents(latexContent);
+        getMathPopup().setButtonText("Apply");
+        getMathPopup().setCallback(new MathPopup.Callback() {
             public void aswerIsYes(boolean yes) {
                 if (yes) {
-                    String latex = mathPopup.getLatexValue();
+                    String latex = getMathPopup().getLatexValue();
 
                     Element placeholder = createLatexPlaceholder(latex);
                     replaceElementInEditor(targetElement, placeholder);
@@ -80,7 +80,7 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
             }
 
         });
-        mathPopup.setPopupPositionAndShow(new PopupPanel.PositionCallback() {
+        getMathPopup().setPopupPositionAndShow(new PopupPanel.PositionCallback() {
 
             public void setPosition(int offsetWidth, int offsetHeight) {
                 int trueAbsoluteLeft = targetElement.getAbsoluteLeft()
@@ -98,7 +98,7 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
                 int left = elementHorizontalCenter - offsetWidth / 2;
                 int top = elementVerticalCenter - offsetHeight / 2;
 
-                mathPopup.setPopupPosition(left, top);
+                getMathPopup().setPopupPosition(left, top);
             }
         });
 
@@ -115,17 +115,17 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
     }
 
     private void createAndShowAddPopup(ClickEvent event) {
-        mathPopup.hide();
-        mathPopup.setContents("");
+        getMathPopup().hide();
+        getMathPopup().setContents("");
 
-        mathPopup.showRelativeTo((UIObject) event.getSource());
+        getMathPopup().showRelativeTo((UIObject) event.getSource());
 
-        mathPopup.setButtonText("Add");
+        getMathPopup().setButtonText("Add");
 
-        mathPopup.setCallback(new MathPopup.Callback() {
+        getMathPopup().setCallback(new MathPopup.Callback() {
             public void aswerIsYes(boolean yes) {
                 if (yes) {
-                    String latex = mathPopup.getLatexValue();
+                    String latex = getMathPopup().getLatexValue();
 
                     Element placeholder = createLatexPlaceholder(latex);
                     getTextArea().getFormatter().insertHTML(
@@ -161,6 +161,10 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
                 (com.google.gwt.user.client.Element) targetElement);
         DOM.removeChild((com.google.gwt.user.client.Element) mathAreaBody,
                 (com.google.gwt.user.client.Element) targetElement);
+    }
+
+    public MathPopup getMathPopup() {
+        return mathPopup;
     }
 
 }

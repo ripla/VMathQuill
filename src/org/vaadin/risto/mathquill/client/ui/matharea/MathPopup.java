@@ -1,22 +1,31 @@
 package org.vaadin.risto.mathquill.client.ui.matharea;
 
+import org.vaadin.risto.mathquill.client.ui.MathElementInserter;
 import org.vaadin.risto.mathquill.client.ui.MathJsBridge;
+import org.vaadin.risto.mathquill.client.ui.VMathField;
+import org.vaadin.risto.mathquill.client.ui.VMathFocusHandler;
+import org.vaadin.risto.mathquill.client.ui.VMathTextFieldEventHandler;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
+import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 
-public class MathPopup extends PopupPanel {
+public class MathPopup extends PopupPanel implements VMathField {
 
     private static final String PRIMARYSTYLENAME = "richtext-mathpopup";
 
@@ -27,10 +36,18 @@ public class MathPopup extends PopupPanel {
     private Element mathTextBox;
     private Callback callback;
     private Button yes;
+    private final VMathTextFieldEventHandler eventHandler;
+    private boolean hasFocus;
+    private HandlerRegistration handlerRegistration;
 
     public MathPopup() {
         super(true);
         addStyleName(PRIMARYSTYLENAME);
+
+        // so that clicks on the toolbar buttons don't hide this
+        addAutoHidePartner(Document.get().getElementById("globalMathToolbar"));
+
+        eventHandler = new VMathTextFieldEventHandler();
     }
 
     public void setContents(String contents) {
@@ -96,5 +113,44 @@ public class MathPopup extends PopupPanel {
     public void setButtonText(String caption) {
         yes.setText(caption);
 
+    }
+
+    public void insertNewElement(String latexCommand) {
+        MathElementInserter.insertNewElement(mathTextBox, latexCommand);
+    }
+
+    protected void handlePreviewEvent(NativePreviewEvent event) {
+        if (eventHandler.validEventTargetsThis(getElement(), event)) {
+            if (!hasFocus) {
+                hasFocus = true;
+
+                // this is the currently focused field globally
+                VMathFocusHandler.setFocusedMathTextField(this);
+            }
+        } else if (hasFocus && eventHandler.shouldLoseFocusFor(event)) {
+            hasFocus = false;
+        }
+    }
+
+    @Override
+    protected void onAttach() {
+        super.onAttach();
+        handlerRegistration = Event
+                .addNativePreviewHandler(new NativePreviewHandler() {
+                    public void onPreviewNativeEvent(NativePreviewEvent event) {
+                        handlePreviewEvent(event);
+                    }
+
+                });
+    }
+
+    @Override
+    protected void onDetach() {
+        handlerRegistration.removeHandler();
+
+        // this cannot be the one focused field after it's detached
+        VMathFocusHandler.removeFocus(this);
+
+        super.onDetach();
     }
 }

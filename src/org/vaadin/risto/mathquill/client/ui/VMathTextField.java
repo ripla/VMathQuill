@@ -15,11 +15,9 @@ import com.vaadin.terminal.gwt.client.RenderSpace;
 import com.vaadin.terminal.gwt.client.UIDL;
 import com.vaadin.terminal.gwt.client.Util;
 
-public class VMathTextField extends HTML implements Paintable {
+public class VMathTextField extends HTML implements Paintable, VMathField {
 
     public static final String CLASSNAME = "v-mathtextfield";
-
-    public static final String CONTENTMARKER = "{}";
 
     /** The client side widget identifier */
     protected String paintableId;
@@ -79,7 +77,7 @@ public class VMathTextField extends HTML implements Paintable {
             String latex = newMathElement
                     .getStringAttribute(Communication.ATT_ELEMENTLATEX);
 
-            insertNewElement(latex);
+            MathElementInserter.insertNewElement(innerElement, latex);
 
         } else if (uidl.hasVariable(Communication.ATT_CONTENT)) {
             String serverContent = uidl
@@ -123,6 +121,9 @@ public class VMathTextField extends HTML implements Paintable {
     @Override
     protected void onDetach() {
         removeHandler();
+
+        // this cannot be the one focused field after it's detached
+        VMathFocusHandler.removeFocus(this);
         super.onDetach();
     }
 
@@ -141,12 +142,14 @@ public class VMathTextField extends HTML implements Paintable {
         if (eventHandler.validEventTargetsThis(getElement(), event)) {
             if (!hasFocus) {
                 hasFocus = true;
+
+                // this is the currently focused field globally
+                VMathFocusHandler.setFocusedMathTextField(this);
             }
             if (eventHandler.isKeyboardEvent(event)) {
                 checkForSizeChanges();
             }
-        } else if (hasFocus
-                && eventHandler.shouldLoseFocusFor(getElement(), event)) {
+        } else if (hasFocus && eventHandler.shouldLoseFocusFor(event)) {
             hasFocus = false;
             fireFocusLost();
         }
@@ -178,52 +181,6 @@ public class VMathTextField extends HTML implements Paintable {
     }
 
     /**
-     * Insert a new latex element to the current cursor position. If we have a
-     * selection, the selection either replaced or put inside the first content
-     * marker.
-     * 
-     * Afterwards the math element is focused.
-     * 
-     * @param latex
-     */
-    protected void insertNewElement(String latex) {
-        int stepBackCount = calculateStepBack(latex);
-
-        if (MathJsBridge.hasSelection(innerElement) && stepBackCount > 0) {
-            String selection = MathJsBridge.getSelection(innerElement);
-            if (latex.endsWith("{}")) {
-                selection = quoteReplacement(selection);
-                latex = latex.replaceFirst("\\{\\}", "{" + selection + "}");
-
-            }
-            MathJsBridge.insertMath(innerElement, latex);
-            MathJsBridge.stepBack(innerElement, stepBackCount - 1);
-
-        } else {
-            MathJsBridge.insertMath(innerElement, latex);
-            MathJsBridge.stepBack(innerElement, stepBackCount);
-        }
-
-        MathJsBridge.focusElement(innerElement);
-    }
-
-    /**
-     * Recursively calculate how many steps back we have to take so we can focus
-     * the first content marker
-     * 
-     * @param latex
-     * @return
-     */
-    protected int calculateStepBack(String latex) {
-        if (!latex.endsWith(CONTENTMARKER)) {
-            return 0;
-        } else {
-            return 1 + calculateStepBack(latex.substring(0, latex.length()
-                    - CONTENTMARKER.length()));
-        }
-    }
-
-    /**
      * Force Vaadin to re-calculate the parent sizes, and afterwards redraw the
      * math.
      */
@@ -251,23 +208,9 @@ public class VMathTextField extends HTML implements Paintable {
 
     }
 
-    protected String quoteReplacement(String s) {
-        if ((s.indexOf('\\') == -1) && (s.indexOf('$') == -1))
-            return s;
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\\') {
-                sb.append('\\');
-                sb.append('\\');
-            } else if (c == '$') {
-                sb.append('\\');
-                sb.append('$');
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
+    public void insertNewElement(String latexCommand) {
+        MathElementInserter.insertNewElement(innerElement, latexCommand);
+
     }
 
 }
