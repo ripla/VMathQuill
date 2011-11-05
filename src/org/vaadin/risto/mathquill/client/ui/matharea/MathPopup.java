@@ -23,9 +23,9 @@ import com.google.gwt.user.client.Event.NativePreviewHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
+import com.vaadin.terminal.gwt.client.ui.VOverlay;
 
-public class MathPopup extends PopupPanel implements VMathField {
+public class MathPopup extends VOverlay implements VMathField {
 
     private static final String PRIMARYSTYLENAME = "richtext-mathpopup";
 
