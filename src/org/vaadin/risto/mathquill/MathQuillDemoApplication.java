@@ -245,7 +245,7 @@ public class MathQuillDemoApplication extends Application {
 
         final MathLabel mathContent = new MathLabel();
 
-        Label mathContentCaption = new Label("MathLabel, normal mode");
+        Label mathContentCaption = new Label("MathLabel");
         mathContentCaption.addStyleName(Reindeer.LABEL_H2);
 
         Label normalLabel = new Label();
