@@ -6,6 +6,8 @@ import org.vaadin.risto.mathquill.client.ui.external.VRichTextToolbar;
 import com.google.gwt.event.logical.shared.InitializeEvent;
 import com.google.gwt.event.logical.shared.InitializeHandler;
 import com.google.gwt.user.client.ui.RichTextArea;
+import com.vaadin.terminal.gwt.client.ApplicationConnection;
+import com.vaadin.terminal.gwt.client.UIDL;
 
 public class VRichMathArea extends VRichTextArea {
 
@@ -43,5 +45,13 @@ public class VRichMathArea extends VRichTextArea {
     @Override
     public VRichMathAreaToolbar getToolbar() {
         return (VRichMathAreaToolbar) super.getToolbar();
+    }
+
+    @Override
+    public void updateFromUIDL(UIDL uidl, ApplicationConnection client) {
+        super.updateFromUIDL(uidl, client);
+
+        // make sure values from server have click handlers
+        getToolbar().getHandler().reAttachClickHandlers();
     }
 }

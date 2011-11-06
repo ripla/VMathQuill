@@ -2,6 +2,7 @@ package org.vaadin.risto.mathquill.client.ui.matharea;
 
 import org.vaadin.risto.mathquill.client.ui.external.VRichTextAreaEventHandler;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -150,7 +151,21 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
     }
 
     public void reAttachClickHandlers() {
+        JsArray<Element> mathImageElements = RichTextJs.getMathImageElements();
+        for (int i = 0; i < mathImageElements.length(); i++) {
+            Element jqueryElement = mathImageElements.get(i);
+            Element element = RichTextJs.getDocumentElement(
+                    getTextArea().getElement()).getElementById(
+                    jqueryElement.getId());
+            com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) element;
+            final String latexContent = DOM.getElementProperty(castElement,
+                    "title");
 
+            // just attaching a click handler doesn't work here, we have to
+            // recreate the whole element
+            Element newPlaceHolder = createLatexPlaceholder(latexContent);
+            replaceElementInEditor(element, newPlaceHolder);
+        }
     }
 
     protected void replaceElementInEditor(final Element targetElement,
