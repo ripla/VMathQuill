@@ -13,8 +13,8 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
@@ -105,16 +105,16 @@ public class MathPopup extends VOverlay implements VMathField {
 
         this.add(panel);
 
-        KeyPressHandler enterHandler = new KeyPressHandler() {
+        KeyDownHandler enterHandler = new KeyDownHandler() {
 
-            public void onKeyPress(KeyPressEvent event) {
+            public void onKeyDown(KeyDownEvent event) {
                 if (KeyCodes.KEY_ENTER == event.getNativeEvent().getKeyCode()) {
                     yes.click();
                 }
 
             }
         };
-        this.addDomHandler(enterHandler, KeyPressEvent.getType());
+        panel.addDomHandler(enterHandler, KeyDownEvent.getType());
     }
 
     public String getLatexValue() {

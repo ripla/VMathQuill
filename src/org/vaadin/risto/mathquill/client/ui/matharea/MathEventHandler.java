@@ -4,6 +4,8 @@ import org.vaadin.risto.mathquill.client.ui.external.VRichTextAreaEventHandler;
 
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.http.client.URL;
@@ -16,6 +18,7 @@ import com.google.gwt.user.client.ui.UIObject;
 
 public class MathEventHandler extends VRichTextAreaEventHandler {
 
+    private static final String LATEX_PLACE_HOLDER_MARKER = "latexPlaceHolderMarker";
     private final RichTextArea textArea;
     private final MathPopup mathPopup;
 
@@ -26,14 +29,13 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         mathPopup = new MathPopup();
     }
 
-    protected Element createLatexPlaceholder(final String latexContent) {
+    protected void setLatexImageProperties(final String latexContent,
+            final Element latexPlaceHolder) {
+        com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) latexPlaceHolder;
+
         // create image URL
         String src = URL.encode("http://latex.codecogs.com/gif.latex?"
                 + latexContent);
-
-        // create element
-        final Element latexPlaceHolder = DOM.createImg();
-        com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) latexPlaceHolder;
 
         // set element click handler
         DOM.sinkEvents(castElement, Event.ONCLICK);
@@ -50,16 +52,18 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         DOM.setImgSrc(castElement, src);
         latexPlaceHolder.setPropertyString("className", "latexPlaceHolder");
         latexPlaceHolder.getStyle().setCursor(Cursor.POINTER);
-
-        // set element unique id
-        latexPlaceHolder.setId("latexPlaceHolder_" + latexContent + "_"
-                + Math.random());
-        return latexPlaceHolder;
     }
 
     protected void handlePlaceHolderClick(Element placeHolderElement,
             String latexContent) {
         createAndShowEditPopup(placeHolderElement, latexContent);
+    }
+
+    protected void handleAddButtonClick(ClickEvent event) {
+        // work around a bug: at least gecko throws an exception if the
+        // editable area hasn't been focused first
+        textArea.setFocus(true);
+        createAndShowAddPopup(event);
     }
 
     private void createAndShowEditPopup(final Element targetElement,
@@ -71,15 +75,13 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         getMathPopup().setCallback(new MathPopup.Callback() {
             public void aswerIsYes(boolean yes) {
                 if (yes) {
-                    String latex = getMathPopup().getLatexValue();
-
-                    Element placeholder = createLatexPlaceholder(latex);
-                    replaceElementInEditor(targetElement, placeholder);
+                    String newLatex = getMathPopup().getLatexValue();
+                    setLatexImageProperties(newLatex, targetElement);
                     textArea.setFocus(true);
                 }
             }
-
         });
+
         getMathPopup().setPopupPositionAndShow(
                 new PopupPanel.PositionCallback() {
 
@@ -108,8 +110,7 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
     @Override
     public void onClick(ClickEvent event) {
         if (event.getSource() == getRichTextToolbar().getMathifyButton()) {
-            RichTextJs.getSelection(textArea.getElement());
-            createAndShowAddPopup(event);
+            handleAddButtonClick(event);
         } else {
             super.onClick(event);
         }
@@ -127,18 +128,41 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
             public void aswerIsYes(boolean yes) {
                 if (yes) {
                     String latex = getMathPopup().getLatexValue();
-
-                    Element placeholder = createLatexPlaceholder(latex);
-                    getTextArea().getFormatter().insertHTML(
-                            "<span id='latexPlaceHolderMarker' />");
-                    Element markerElement = RichTextJs.getDocumentElement(
-                            getTextArea().getElement()).getElementById(
-                            "latexPlaceHolderMarker");
-
-                    replaceElementInEditor(markerElement, placeholder);
+                    insertNewLatex(latex);
+                    textArea.setFocus(true);
                 }
             }
+
         });
+    }
+
+    protected void insertNewLatex(String latex) {
+        ImageElement marker = insertMarker();
+        setLatexImageProperties(latex, marker);
+    }
+
+    protected ImageElement insertMarker() {
+        getTextArea().getFormatter().insertImage(LATEX_PLACE_HOLDER_MARKER);
+        return getMarkerElement();
+    }
+
+    protected ImageElement getMarkerElement() {
+        NodeList<Element> elements = RichTextJs.getDocumentElement(
+                getTextArea().getElement()).getElementsByTagName("img");
+        return filterImageElementWithSrc(elements, LATEX_PLACE_HOLDER_MARKER);
+    }
+
+    protected ImageElement filterImageElementWithSrc(
+            NodeList<Element> elements, String wantedSrc) {
+        for (int i = 0; i < elements.getLength(); i++) {
+            ImageElement element = (ImageElement) elements.getItem(i);
+            if (element.getSrc() != null
+                    && element.getSrc().endsWith(LATEX_PLACE_HOLDER_MARKER)) {
+                return element;
+            }
+        }
+        throw new IllegalStateException("No img tag with given src "
+                + wantedSrc);
     }
 
     @Override
@@ -154,32 +178,18 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         JsArray<Element> mathImageElements = RichTextJs.getMathImageElements();
         for (int i = 0; i < mathImageElements.length(); i++) {
             Element jqueryElement = mathImageElements.get(i);
-            Element element = RichTextJs.getDocumentElement(
+            Element oldImagePlaceholder = RichTextJs.getDocumentElement(
                     getTextArea().getElement()).getElementById(
                     jqueryElement.getId());
-            com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) element;
+            com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) oldImagePlaceholder;
             final String latexContent = DOM.getElementProperty(castElement,
                     "title");
 
-            // just attaching a click handler doesn't work here, we have to
-            // recreate the whole element
-            Element newPlaceHolder = createLatexPlaceholder(latexContent);
-            replaceElementInEditor(element, newPlaceHolder);
+            setLatexImageProperties(latexContent, oldImagePlaceholder);
         }
-    }
-
-    protected void replaceElementInEditor(final Element targetElement,
-            Element placeholder) {
-        Element mathAreaBody = RichTextJs.getBodyElement(textArea.getElement());
-        DOM.insertBefore((com.google.gwt.user.client.Element) mathAreaBody,
-                (com.google.gwt.user.client.Element) placeholder,
-                (com.google.gwt.user.client.Element) targetElement);
-        DOM.removeChild((com.google.gwt.user.client.Element) mathAreaBody,
-                (com.google.gwt.user.client.Element) targetElement);
     }
 
     public MathPopup getMathPopup() {
         return mathPopup;
     }
-
 }

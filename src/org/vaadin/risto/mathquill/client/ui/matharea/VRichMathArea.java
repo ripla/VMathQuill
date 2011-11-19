@@ -22,10 +22,6 @@ public class VRichMathArea extends VRichTextArea {
         return new VRichMathAreaToolbar(rta);
     }
 
-    protected String getSelection() {
-        return RichTextJs.getSelection(getElement()).get(0);
-    }
-
     @Override
     protected RichTextArea createRichTextArea() {
         final RichTextArea rta = new RichTextArea();
