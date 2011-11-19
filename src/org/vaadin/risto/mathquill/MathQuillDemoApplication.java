@@ -214,7 +214,7 @@ public class MathQuillDemoApplication extends Application {
         Label staticToolbarHeader = new Label("User created toolbar");
         staticToolbarHeader.setStyleName(Reindeer.LABEL_H2);
         Label staticToolbarText = new Label(
-                "This toolbar is a normal Vaadin HorizontalLayout. It specifically targets this MathTextField.");
+                "This toolbar is a normal Vaadin HorizontalLayout. It specifically targets this MathTextField. It is meant to be a simple and themable as possible.");
 
         Label globalToolbarHeader = new Label("Floating toolbar");
         globalToolbarHeader.setStyleName(Reindeer.LABEL_H2);
@@ -246,14 +246,20 @@ public class MathQuillDemoApplication extends Application {
         final MathLabel mathContent = new MathLabel();
 
         Label mathContentCaption = new Label("MathLabel");
-        mathContentCaption.addStyleName(Reindeer.LABEL_H2);
+        mathContentCaption.setStyleName(Reindeer.LABEL_H2);
 
         Label normalLabel = new Label();
         normalLabel.setPropertyDataSource(exampleDatasource);
         normalLabel.setContentMode(Label.CONTENT_XHTML);
 
         Label normalLabelCaption = new Label("Vaadin Label, XHTML mode");
-        normalLabelCaption.addStyleName(Reindeer.LABEL_H2);
+        normalLabelCaption.setStyleName(Reindeer.LABEL_H2);
+
+        Label layoutCaption = new Label("Layout from the MathArea contents");
+        layoutCaption.setStyleName(Reindeer.LABEL_H2);
+
+        final VerticalLayout contentLayout = new VerticalLayout();
+        contentLayout.setSpacing(true);
 
         final RichMathArea richEditor = new RichMathArea();
         richEditor.setImmediate(true);
@@ -264,7 +270,14 @@ public class MathQuillDemoApplication extends Application {
             private static final long serialVersionUID = 6852597702928266038L;
 
             public void valueChange(ValueChangeEvent event) {
-                mathContent.setValue(richEditor.getMathValue());
+                mathContent.setValue(MathValueParser.get().getMathValue(
+                        richEditor));
+                contentLayout.removeAllComponents();
+
+                for (Component c : MathValueParser.get()
+                        .getMathValueAsComponents(richEditor)) {
+                    contentLayout.addComponent(c);
+                }
             }
         });
 
@@ -277,6 +290,8 @@ public class MathQuillDemoApplication extends Application {
         layout.addComponent(mathContent);
         layout.addComponent(normalLabelCaption);
         layout.addComponent(normalLabel);
+        layout.addComponent(layoutCaption);
+        layout.addComponent(contentLayout);
 
         return layout;
     }
