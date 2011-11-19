@@ -6,6 +6,10 @@ import com.google.gwt.dom.client.Element;
 
 public class RichTextJs {
 
+    public static native Element getBodyElement(Element richText) /*-{
+                                                                  return richText.contentWindow.document.body;
+                                                                  }-*/;
+
     public static native Document getDocumentElement(Element richText) /*-{
                                                                        return richText.contentWindow.document;
                                                                        }-*/;

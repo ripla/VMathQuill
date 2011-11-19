@@ -15,6 +15,7 @@ import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.UIObject;
+import com.vaadin.terminal.gwt.client.BrowserInfo;
 
 public class MathEventHandler extends VRichTextAreaEventHandler {
 
@@ -76,10 +77,11 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
             public void aswerIsYes(boolean yes) {
                 if (yes) {
                     String newLatex = getMathPopup().getLatexValue();
-                    setLatexImageProperties(newLatex, targetElement);
+                    editLatex(targetElement, newLatex);
                     textArea.setFocus(true);
                 }
             }
+
         });
 
         getMathPopup().setPopupPositionAndShow(
@@ -105,6 +107,21 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
                     }
                 });
 
+    }
+
+    protected void editLatex(final Element latexElement, String newLatex) {
+        // if (BrowserInfo.get().isGecko()) {
+        // final Element newLatexElement = createNewLatexImage(newLatex);
+        // replaceElementInEditor(latexElement, newLatexElement);
+        // } else {
+        setLatexImageProperties(newLatex, latexElement);
+        // }
+    }
+
+    protected Element createNewLatexImage(String newLatex) {
+        final Element newLatexElement = DOM.createImg();
+        setLatexImageProperties(newLatex, newLatexElement);
+        return newLatexElement;
     }
 
     @Override
@@ -137,8 +154,14 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
     }
 
     protected void insertNewLatex(String latex) {
-        ImageElement marker = insertMarker();
-        setLatexImageProperties(latex, marker);
+        if (BrowserInfo.get().isGecko()) {
+            ImageElement marker = insertMarker();
+            final Element newLatexElement = createNewLatexImage(latex);
+            replaceElementInEditor(marker, newLatexElement);
+        } else {
+            ImageElement marker = insertMarker();
+            setLatexImageProperties(latex, marker);
+        }
     }
 
     protected ImageElement insertMarker() {
@@ -185,11 +208,22 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
             final String latexContent = DOM.getElementProperty(castElement,
                     "title");
 
-            setLatexImageProperties(latexContent, oldImagePlaceholder);
+            final Element newLatexElement = createNewLatexImage(latexContent);
+            replaceElementInEditor(oldImagePlaceholder, newLatexElement);
         }
     }
 
     public MathPopup getMathPopup() {
         return mathPopup;
+    }
+
+    protected void replaceElementInEditor(final Element oldElement,
+            Element newElement) {
+        Element mathAreaBody = RichTextJs.getBodyElement(textArea.getElement());
+        DOM.insertBefore((com.google.gwt.user.client.Element) mathAreaBody,
+                (com.google.gwt.user.client.Element) newElement,
+                (com.google.gwt.user.client.Element) oldElement);
+        DOM.removeChild((com.google.gwt.user.client.Element) mathAreaBody,
+                (com.google.gwt.user.client.Element) oldElement);
     }
 }
