@@ -53,6 +53,10 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         DOM.setImgSrc(castElement, src);
         latexPlaceHolder.setPropertyString("className", "latexPlaceHolder");
         latexPlaceHolder.getStyle().setCursor(Cursor.POINTER);
+
+        // set element unique id
+        latexPlaceHolder.setId("latexPlaceHolder_" + latexContent + "_"
+                + Math.random());
     }
 
     protected void handlePlaceHolderClick(Element placeHolderElement,
