@@ -1,8 +1,10 @@
 package org.vaadin.risto.mathquill.client.ui.matharea;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.vaadin.risto.mathquill.client.ui.external.VRichTextAreaEventHandler;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NodeList;
@@ -19,6 +21,7 @@ import com.vaadin.terminal.gwt.client.BrowserInfo;
 
 public class MathEventHandler extends VRichTextAreaEventHandler {
 
+    private static final String LATEX_PLACE_HOLDER = "latexPlaceHolder";
     private static final String LATEX_PLACE_HOLDER_MARKER = "latexPlaceHolderMarker";
     private final RichTextArea textArea;
     private final MathPopup mathPopup;
@@ -51,7 +54,7 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
         // set element content
         DOM.setElementProperty(castElement, "title", latexContent);
         DOM.setImgSrc(castElement, src);
-        latexPlaceHolder.setPropertyString("className", "latexPlaceHolder");
+        latexPlaceHolder.setPropertyString("className", LATEX_PLACE_HOLDER);
         latexPlaceHolder.getStyle().setCursor(Cursor.POINTER);
 
         // set element unique id
@@ -202,19 +205,27 @@ public class MathEventHandler extends VRichTextAreaEventHandler {
     }
 
     public void reAttachClickHandlers() {
-        JsArray<Element> mathImageElements = RichTextJs.getMathImageElements();
-        for (int i = 0; i < mathImageElements.length(); i++) {
-            Element jqueryElement = mathImageElements.get(i);
-            Element oldImagePlaceholder = RichTextJs.getDocumentElement(
-                    getTextArea().getElement()).getElementById(
-                    jqueryElement.getId());
-            com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) oldImagePlaceholder;
+        for (Element element : getLatexImageElements()) {
+            com.google.gwt.user.client.Element castElement = (com.google.gwt.user.client.Element) element;
             final String latexContent = DOM.getElementProperty(castElement,
                     "title");
 
             final Element newLatexElement = createNewLatexImage(latexContent);
-            replaceElementInEditor(oldImagePlaceholder, newLatexElement);
+            replaceElementInEditor(element, newLatexElement);
         }
+    }
+
+    private List<Element> getLatexImageElements() {
+        NodeList<Element> elementsByTagName = RichTextJs.getBodyElement(
+                getTextArea().getElement()).getElementsByTagName("img");
+        List<Element> result = new ArrayList<Element>();
+        for (int i = 0; i < elementsByTagName.getLength(); i++) {
+            Element item = elementsByTagName.getItem(i);
+            if (LATEX_PLACE_HOLDER.equals(item.getClassName())) {
+                result.add(item);
+            }
+        }
+        return result;
     }
 
     public MathPopup getMathPopup() {

@@ -28,9 +28,30 @@
 		</init-param>
 	</servlet>
 
+	<servlet>
+		<servlet-name>MathQuill Vaadin integration test1</servlet-name>
+		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+		<init-param>
+			<description>
+			Vaadin application class to start</description>
+			<param-name>application</param-name>
+			<param-value>org.vaadin.risto.mathquill.TestApplication</param-value>
+		</init-param>
+		<init-param>
+			<description>
+			Application widgetset</description>
+			<param-name>widgetset</param-name>
+			<param-value>org.vaadin.risto.mathquill.VMathQuillWidgetset</param-value>
+		</init-param>
+	</servlet>
+
 	<servlet-mapping>
 		<servlet-name>MathQuill Vaadin integration demo</servlet-name>
 		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>MathQuill Vaadin integration test1</servlet-name>
+		<url-pattern>/test1/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>
