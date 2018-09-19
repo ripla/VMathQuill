@@ -1,3 +1,6 @@
+[![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/mathquill-integration)
+[![Stars on Vaadin Directory](https://img.shields.io/vaadin-directory/star/mathquill-integration.svg)](https://vaadin.com/directory/component/mathquill-integration)
+
 # VMathQuill
 
 VMathQuill is a [Vaadin](http://www.vaadin.com) integration of the [MathQuill](https://github.com/laughinghan/mathquill) javascript library. It offers familiar Vaadin concepts such as Labels and TextFields as MathQuill enabled variants. This integration also uses [CodeCogs](http://www.codecogs.com/latex/htmlequations.php) to render math in some parts. The demo can be found [here](http://risto.virtuallypreinstalled.com/mathquill/).
